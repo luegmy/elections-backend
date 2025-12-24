@@ -1,4 +1,4 @@
-package com.gage.elections.model;
+package com.gage.elections.model.candidate;
 
 import lombok.Getter;
 import lombok.Setter;

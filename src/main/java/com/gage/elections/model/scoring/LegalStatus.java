@@ -1,4 +1,4 @@
-package com.gage.elections.model;
+package com.gage.elections.model.scoring;
 
 public enum LegalStatus {
     SENTENCIA_FIRME_CONDENATORIA, // Sentencia final, culpable

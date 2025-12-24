@@ -1,4 +1,4 @@
-package com.gage.elections.model;
+package com.gage.elections.model.candidate;
 
 // Tipos de logros que registraremos
 public enum AchievementType {

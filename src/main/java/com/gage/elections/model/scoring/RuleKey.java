@@ -1,4 +1,4 @@
-package com.gage.elections.model;
+package com.gage.elections.model.scoring;
 
 public record RuleKey(LegalStatus status, IncidentSeverity severity) {
 }

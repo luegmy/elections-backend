@@ -1,4 +1,4 @@
-package com.gage.elections.model;
+package com.gage.elections.model.candidate;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +9,7 @@ public class Proposal {
     private String id;
     private String title;
     private String description;
+    private String detailDescription;
     private String area;            // Eje Temático (Ej: Salud, Educación, Minería)
     private String sourcePlan;      // Sección del Plan de Gobierno donde se encuentra
 

@@ -1,5 +1,7 @@
-package com.gage.elections.model;
+package com.gage.elections.model.candidate;
 
+import com.gage.elections.model.scoring.IncidentSeverity;
+import com.gage.elections.model.scoring.LegalStatus;
 import lombok.Getter;
 import lombok.Setter;
 

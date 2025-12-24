@@ -1,4 +1,4 @@
-package com.gage.elections.model;
+package com.gage.elections.model.scoring;
 
 public enum IncidentSeverity {
     GRAVE, // Corrupción, Peculado, Lavado de Activos, Homicidio

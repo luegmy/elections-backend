@@ -1,6 +1,6 @@
 package com.gage.elections.service;
 
-import com.gage.elections.model.Counter;
+import com.gage.elections.model.candidate.Counter;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
