@@ -1,0 +1,91 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: election-api
+
+  data:
+    mongodb:
+      uri: ${MONGO_URI}
+electoral:
+  scoring:
+    judicial:
+      base-score: 100.0
+      penalties:
+        - status: SENTENCIA_FIRME_CONDENATORIA
+          severity: GRAVE
+          value: 50.0
+        - status: SENTENCIA_PRIMERA_INSTANCIA
+          severity: GRAVE
+          value: 35.0
+        - status: PROCESO_JUDICIAL_ABIERTO
+          severity: GRAVE
+          value: 20.0
+        - status: INVESTIGACION_PRELIMINAR
+          severity: GRAVE
+          value: 10.0
+
+        - status: SENTENCIA_FIRME_CONDENATORIA
+          severity: MODERADO
+          value: 30.0
+        - status: SENTENCIA_PRIMERA_INSTANCIA
+          severity: MODERADO
+          value: 21.0
+        - status: PROCESO_JUDICIAL_ABIERTO
+          severity: MODERADO
+          value: 12.0
+        - status: INVESTIGACION_PRELIMINAR
+          severity: MODERADO
+          value: 6.0
+
+        - status: SENTENCIA_FIRME_CONDENATORIA
+          severity: LEVE
+          value: 10.0
+        - status: SENTENCIA_PRIMERA_INSTANCIA
+          severity: LEVE
+          value: 7.0
+        - status: PROCESO_JUDICIAL_ABIERTO
+          severity: LEVE
+          value: 4.0
+        - status: INVESTIGACION_PRELIMINAR
+          severity: LEVE
+          value: 2.0
+    contribution:
+      max-sub-score: 50.0
+      max-years-experience: 10
+      max-items-allowed: 5
+      bonuses:
+        academic:
+          doctorado: 25.0
+          maestria: 15.0
+          bachiller: 8.0
+        social-leadership: 15.0
+        relevance:
+          alta: 15.0
+          media: 7.0
+          baja: 2.0
+      penalties:
+        promise-broken: 20.0
+
+    transparency:
+      declaration-base: 15.0
+      inconsistency-bonuses: [10.0, 5.0, 0.0] # 0, 1, o más inconsistencias
+      economic-info-item: 5.0
+      attendance-weight: 0.1 # Multiplicador para el % de asistencia
+
+    trust:
+      initial-score: 100.0
+      penalties:
+        major-scandal: 30.0
+        minor-controversy: 10.0
+        fact-check-max: 25.0
+        fact-check-unit: 5.0
+        ethics-sanction: 25.0
+        party-switches: [0.0, 5.0, 15.0, 30.0] # 0, 1, 2, 3+ cambios
+
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+    org.mongodb.driver: INFO
+
