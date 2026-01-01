@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: election-api
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/electiondb
+
+logging:
+  level:
+    root: INFO
+    com.gage.elections: DEBUG
+

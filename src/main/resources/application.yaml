@@ -8,6 +8,12 @@ spring:
   data:
     mongodb:
       uri: ${MONGO_URI}
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
 electoral:
   scoring:
     judicial:
@@ -57,22 +63,26 @@ electoral:
       max-items-allowed: 5
       bonuses:
         academic:
-          doctorado: 25.0
-          maestria: 15.0
-          bachiller: 8.0
+          doctorate: 25.0
+          mastery: 15.0
+          bachelor: 8.0
         social-leadership: 15.0
         relevance:
-          alta: 15.0
-          media: 7.0
-          baja: 2.0
+          high: 15.0
+          medium: 7.0
+          low: 2.0
       penalties:
         promise-broken: 20.0
 
     transparency:
       declaration-base: 15.0
-      inconsistency-bonuses: [10.0, 5.0, 0.0] # 0, 1, o más inconsistencias
+      inconsistency-bonuses:
+        0: 10.0
+        1: 5.0
+        2: 0.0
       economic-info-item: 5.0
-      attendance-weight: 0.1 # Multiplicador para el % de asistencia
+      attendance-weight: 0.1
+      default-attendance-point: 8.0
 
     trust:
       initial-score: 100.0
@@ -82,7 +92,11 @@ electoral:
         fact-check-max: 25.0
         fact-check-unit: 5.0
         ethics-sanction: 25.0
-        party-switches: [0.0, 5.0, 15.0, 30.0] # 0, 1, 2, 3+ cambios
+        party-switches:
+          0: 0.0
+          1: 5.0
+          2: 15.0
+          3: 30
 
 logging:
   level:

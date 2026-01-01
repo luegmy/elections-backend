@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -91,81 +90,91 @@ public class CandidateService {
                 .orElseThrow(() -> new IllegalArgumentException("Candidate not found: " + id));
     }
 
-    public List<MatchResponse> searchCandidatesAtlas(String search) {
+    public List<MatchResponse> searchCandidatesAtlas(String rawQuery) {
 
-        String sanitizedQuery = SearchUtils.sanitize(search);
-
-        if (!SearchUtils.isValid(sanitizedQuery)) {
+        String query = sanitizeAndValidate(rawQuery);
+        if (query == null) {
             return Collections.emptyList();
         }
 
-        // 1. Stage $search (Atlas Search ordena por relevancia automáticamente)
-        AggregationOperation searchStage = context -> new Document("$search",
-                new Document("index", "default")
-                        .append("compound", new Document()
-                                .append("should", List.of(
-                                        // Boost a palabras clave del plan (Importancia 2x)
-                                        createTextFieldSearch(
-                                                sanitizedQuery,
-                                                List.of("planKeywords"),
-                                                2.0
-                                        ),
-                                        // Búsqueda general en campos relevantes
-                                        createTextFieldSearch(
-                                                sanitizedQuery,
-                                                List.of(
-                                                        "name",
-                                                        "position",
-                                                        "proposals.title",
-                                                        "proposals.description",
-                                                        "history.title",
-                                                        "history.description"
-                                                ),
-                                                1.0
-                                        )
-                                ))
-                        )
-        );
-
-        // 2. Agregación final (sin score explícito)
         Aggregation aggregation = Aggregation.newAggregation(
-                searchStage,
+                buildAtlasSearchStage(query),
                 Aggregation.limit(20)
         );
 
-        List<Candidate> candidates = mongoTemplate
+        return mongoTemplate
                 .aggregate(aggregation, "candidates", Candidate.class)
-                .getMappedResults();
-
-        return candidates.stream()
-                .map(c -> matchMapper.toMatchResponse(c, sanitizedQuery))
+                .getMappedResults()
+                .stream()
+                .map(candidate -> matchMapper.toMatchResponse(candidate, query))
                 .toList();
     }
 
-    private Document createTextFieldSearch(String query, List<String> paths, double boost) {
 
-        Document textNode = new Document()
+    private void recalculateScore(Candidate candidate) {
+
+        CompositeScore newScores = scoringService.calculateAll(candidate);
+        int level = scoringService.determineRankingLevel(newScores.getFinalScore());
+
+        candidate.updateScoring(newScores, level);
+    }
+
+    private String sanitizeAndValidate(String rawQuery) {
+
+        String sanitized = SearchUtils.sanitize(rawQuery);
+
+        return SearchUtils.isValid(sanitized)
+                ? sanitized
+                : null;
+    }
+
+    private AggregationOperation buildAtlasSearchStage(String query) {
+
+        return context -> new Document("$search",
+                new Document("index", "default")
+                        .append("compound", new Document("should", List.of(
+                                searchInPlanKeywords(query),
+                                searchInCandidateProfile(query)
+                        )))
+        );
+    }
+
+    private Document searchInPlanKeywords(String query) {
+        return createTextSearch(
+                query,
+                List.of("planKeywords"),
+                2.0
+        );
+    }
+
+    private Document searchInCandidateProfile(String query) {
+        return createTextSearch(
+                query,
+                List.of(
+                        "name",
+                        "position",
+                        "proposals.title",
+                        "proposals.description",
+                        "history.title",
+                        "history.description"
+                ),
+                1.0
+        );
+    }
+
+    private Document createTextSearch(String query, List<String> paths, double boost) {
+
+        Document text = new Document()
                 .append("query", query)
                 .append("path", paths.size() == 1 ? paths.get(0) : paths)
                 .append("fuzzy", new Document("maxEdits", 2));
 
         if (boost > 1.0) {
-            textNode.append("score",
+            text.append("score",
                     new Document("boost", new Document("value", boost)));
         }
 
-        return new Document("text", textNode);
+        return new Document("text", text);
     }
-
-    private void recalculateScore(Candidate candidate) {
-        // Calculamos el nuevo score
-        CompositeScore newScores = scoringService.calculateAll(candidate);
-        int level = scoringService.determineRankingLevel(newScores.getFinalScore());
-
-        // Aplicamos al modelo (Setter profesional)
-        candidate.applyScore(newScores, level);
-        candidate.setLastAuditDate(LocalDateTime.now());
-    }
-
 }
 

@@ -20,10 +20,10 @@ public class ContributionScoreCalculator {
         double publicWorkPoints = 0;
         int lawsCount = 0;
         int projectsCount = 0;
-        int initiativePoints = 0;
-        int yearsOfExp = 0;
+        double initiativePoints = 0;
+        double yearsOfExperience = 0;
         int topAcademicRelevance = 0;
-        double experiencePoints = 0;
+        double leaderPoints = 0;
 
         for (Achievement a : achievements) {
             switch (a.getType()) {
@@ -42,23 +42,22 @@ public class ContributionScoreCalculator {
                         topAcademicRelevance = Math.max(topAcademicRelevance, a.getRelevance());
 
                 case PUBLIC_SECTOR_EXPERIENCE ->
-                        yearsOfExp += a.getQuantity();
+                        yearsOfExperience += a.getQuantity();
 
                 case SOCIAL_PROJECT_LEADERSHIP -> {
                     if (a.getRelevance() >= 2)
-                        experiencePoints += props.getBonuses().getOrDefault("social-leadership", 15.0);
+                        leaderPoints += props.getBonuses().getOrDefault("social-leadership", 15.0);
                 }
                 case PROMISE_BROKEN ->
                         publicWorkPoints -= props.getPenalties().getOrDefault("promise-broken", 20.0);
             }
         }
 
-        // Aplicamos los límites (Caps) definidos en el YAML
         double totalPublicWork = Math.min(publicWorkPoints + initiativePoints, props.getMaxSubScore());
 
-        double totalExperience = experiencePoints
+        double totalExperience = leaderPoints
                 + props.getAcademicBonus(topAcademicRelevance)
-                + Math.min(yearsOfExp, props.getMaxYearsExperience());
+                + Math.min(yearsOfExperience, props.getMaxYearsExperience());
 
         totalExperience = Math.min(totalExperience, props.getMaxSubScore());
 
