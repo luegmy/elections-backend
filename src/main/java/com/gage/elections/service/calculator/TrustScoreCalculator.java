@@ -11,27 +11,24 @@ public class TrustScoreCalculator {
 
     private final TrustProperties props;
 
-    public double calculate(Trust t) {
-        if (t == null) return props.getInitialScore();
+    public double calculate(Trust trust) {
+        if (trust == null) return props.getInitialScore();
 
         double score = props.getInitialScore();
 
-        score -= t.getMajorSanctions() * props.getPenalties().getMajorScandal();
-        score -= t.getPartySwitches() * props.getPenalties().getMinorControversy();
+        score -= trust.getMajorSanctions() * props.getPenalties().getMajorScandal();
+        score -= trust.getPartySwitches() * props.getPenalties().getMinorControversy();
 
         double factCheckPenalty = Math.min(
-                t.getFactCheckFailures() * props.getPenalties().getFactCheckUnit(),
+                trust.getFactCheckFailures() * props.getPenalties().getFactCheckUnit(),
                 props.getPenalties().getFactCheckMax()
         );
         score -= factCheckPenalty;
 
-        if (t.isEthicsSanction()) score -= props.getPenalties().getEthicsSanction();
+        if (trust.isEthicsSanction()) score -= props.getPenalties().getEthicsSanction();
 
-        // Incoherencia política (Transfuguismo)
-        int switches = t.getPartySwitches();
-        score -= (switches < props.getPenalties().getPartySwitches().size())
-                ? props.getPenalties().getPartySwitches().get(switches)
-                : props.getPenalties().getPartySwitches().get(3); // El máximo castigo
+        int changeParty = trust.getPartySwitches();
+        score -= props.getPenalties().getPartySwitches().getOrDefault(changeParty,0.0);
 
         return Math.max(score, 0.0);
     }

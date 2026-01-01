@@ -15,40 +15,33 @@ public abstract class MatchMapper {
 
     @Mapping(target = "matchType", ignore = true)
     @Mapping(target = "matchSnippet", ignore = true)
-    @Mapping(target = "searchScore", source = "scores.finalScore") // Usamos el score del candidato como base
-    @Mapping(target = "rankingLevel", source = "rankingLevel")
-    protected abstract MatchResponse mapCommonFields(Candidate c);
+    @Mapping(target = "finalScore", source = "candidate.scores.finalScore")
+    protected abstract MatchResponse mapCommonFields(Candidate candidate);
 
-    // 2. Lógica de "Hallazgo" (Match)
-    public MatchResponse toMatchResponse(Candidate c, String search) {
-        if (c == null) return null;
+    public MatchResponse toMatchResponse(Candidate candidate, String search) {
+        if (candidate == null) return null;
 
-        MatchResponse dto = mapCommonFields(c);
+        MatchResponse dto = mapCommonFields(candidate);
         String query = search != null ? search.toLowerCase().trim() : "";
 
-        // Cascada de prioridades para el Snippet y el MatchType
-        if (contains(c.getName(), query)) {
-            return rebuild(dto, "NOMBRE", "Candidato: " + c.getName());
+        if (contains(candidate.getName(), query)) {
+            return rebuild(dto, "NOMBRE", "Candidato: " + candidate.getName());
         }
 
-        if (containsAny(c.getPlanKeywords(), query)) {
+        if (containsAny(candidate.getPlanKeywords(), query)) {
             return rebuild(dto, "PLAN_GOBIERNO", "Coincidencia en palabras clave del plan estratégico.");
         }
 
-        return findProposalMatch(c, query)
+        return findProposalMatch(candidate, query)
                 .map(p -> rebuild(dto, "PROPUESTA", p.getTitle() + ": " + p.getDescription()))
                 .orElseGet(() ->
-                        findLegalHistoryMatch(c, query)
+                        findLegalHistoryMatch(candidate, query)
                                 .map(h -> rebuild(dto, "ANTECEDENTE", h.getTitle() + ": " + h.getDescription()))
                                 .orElse(rebuild(dto, "GENERAL", "Perfil del candidato verificado."))
                 );
     }
 
-    /**
-     * Reconstruye el Record con la información específica del hallazgo.
-     */
     private MatchResponse rebuild(MatchResponse b, String type, String snippet) {
-        // En Java 17, los records se instancian pasando todos los argumentos
         return new MatchResponse(
                 b.code(),
                 b.name(),
@@ -62,18 +55,16 @@ public abstract class MatchMapper {
         );
     }
 
-    // --- Helpers de búsqueda ---
-
-    private Optional<Proposal> findProposalMatch(Candidate c, String query) {
-        if (c.getProposals() == null) return Optional.empty();
-        return c.getProposals().stream()
+    private Optional<Proposal> findProposalMatch(Candidate candidate, String query) {
+        if (candidate.getProposals() == null) return Optional.empty();
+        return candidate.getProposals().stream()
                 .filter(p -> contains(p.getTitle(), query) || contains(p.getDescription(), query))
                 .findFirst();
     }
 
-    private Optional<LegalHistoryEntry> findLegalHistoryMatch(Candidate c, String query) {
-        if (c.getHistory() == null) return Optional.empty();
-        return c.getHistory().stream()
+    private Optional<LegalHistoryEntry> findLegalHistoryMatch(Candidate candidate, String query) {
+        if (candidate.getHistory() == null) return Optional.empty();
+        return candidate.getHistory().stream()
                 .filter(h -> contains(h.getTitle(), query) || contains(h.getDescription(), query))
                 .findFirst();
     }

@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,14 +20,12 @@ import java.util.Map;
 public class JudicialProperties {
 
     private double baseScore;
-    private List<PenaltyRuleItem> penalties;
-
-    // Mapa procesado para búsqueda rápida O(1)
+    private List<PenaltyRuleItem> penalties = new ArrayList<>();
     private Map<RuleKey, Double> penaltyMap = new HashMap<>();
 
     @PostConstruct
     public void init() {
-        // Convertimos la lista del YAML en el Mapa de reglas que ya tenías
+        if (penalties == null) return;
         for (PenaltyRuleItem item : penalties) {
             penaltyMap.put(
                     new RuleKey(item.getStatus(), item.getSeverity()),

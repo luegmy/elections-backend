@@ -31,7 +31,7 @@ public class Candidate {
     private LocalDateTime lastAuditDate;
     private String dataSourceVersion; // Ej: "JNE-V1-2025"
 
-    public void applyScore(CompositeScore scores, int rankingLevel) {
+    public void updateScoring(CompositeScore scores, int rankingLevel) {
         this.scores = scores;
         this.rankingLevel = rankingLevel;
         this.lastAuditDate = LocalDateTime.now();
