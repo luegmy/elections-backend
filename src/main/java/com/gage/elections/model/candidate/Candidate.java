@@ -26,7 +26,6 @@ public class Candidate {
     private CompositeScore scores;
     private int rankingLevel; // Para guardar el resultado del IRQ/Ranking
     private List<Proposal> proposals;
-    private List<String> planKeywords;
 
     private LocalDateTime lastAuditDate;
     private String dataSourceVersion; // Ej: "JNE-V1-2025"

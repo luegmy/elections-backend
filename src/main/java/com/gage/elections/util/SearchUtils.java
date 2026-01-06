@@ -3,6 +3,7 @@ package com.gage.elections.util;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
+import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
@@ -36,5 +37,14 @@ public class SearchUtils {
 
         return Arrays.stream(sanitizedQuery.split("\\s+"))
                 .anyMatch(token -> token.length() >= MIN_QUERY_LENGTH);
+    }
+
+    public static String normalize(String text) {
+        if (text == null) return "";
+        return Normalizer
+                .normalize(text, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .toLowerCase()
+                .trim();
     }
 }
