@@ -14,6 +14,7 @@ public class CompositeScore {
     private double contributionScore;
     private double transparencyScore;
     private double trustScore;
+    private double planScore;
     private double finalScore;
 }
 

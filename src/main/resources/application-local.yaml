@@ -11,6 +11,6 @@ spring:
 
 logging:
   level:
-    root: INFO
-    com.gage.elections: DEBUG
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+    org.mongodb.driver: INFO
 

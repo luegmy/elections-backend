@@ -8,10 +8,7 @@ public record CandidateCreateRequest(
         String party,
         String partyAcronym,
         String biography,
-
         List<ProposalRequest> proposals,
-        List<String> planKeywords,
-
         List<AchievementRequest> achievements,
         TransparencyRequest transparency,
         TrustRequest trust

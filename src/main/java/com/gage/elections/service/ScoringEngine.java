@@ -1,13 +1,11 @@
 package com.gage.elections.service;
 
-import com.gage.elections.model.candidate.Candidate;
-import com.gage.elections.model.candidate.CompositeScore;
-import com.gage.elections.service.calculator.ContributionScoreCalculator;
-import com.gage.elections.service.calculator.JudicialScoreCalculator;
-import com.gage.elections.service.calculator.TransparencyScoreCalculator;
-import com.gage.elections.service.calculator.TrustScoreCalculator;
+import com.gage.elections.model.candidate.*;
+import com.gage.elections.service.calculator.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -17,37 +15,85 @@ public class ScoringEngine {
     private final TransparencyScoreCalculator transparencyCalculator;
     private final ContributionScoreCalculator contributionCalculator;
     private final TrustScoreCalculator trustCalculator;
+    private final PlanScoreCalculator planCalculator;
 
-    public CompositeScore calculateAll(Candidate c) {
 
-        double p1Judicial = judicialCalculator.calculate(c.getHistory());
-        double p2Transparency = transparencyCalculator.calculate(c.getTransparency());
-        double p3Contribution = contributionCalculator.calculate(c.getAchievements());
-        double p4Trust = trustCalculator.calculate(c.getTrust());
+    public CompositeScore calculateAll(Candidate candidate) {
 
-        double p3normalized = (p3Contribution / 50.0) * 100.0;
+        CompositeScore score = new CompositeScore();
 
-        double finalScore = (p1Judicial * 0.40) +
-                (p2Transparency * 0.25) +
-                (p3normalized * 0.15) +
-                (p4Trust * 0.20);
+        score.setJudicialScore(this.getJudicialCalculator(candidate.getHistory()));
+        score.setTransparencyScore(this.getTransparencyCalculator(candidate.getTransparency()));
+        score.setContributionScore( this.getContributionCalculator(candidate.getAchievements()));
+        score.setTrustScore(this.getTrustCalculator(candidate.getTrust()));
+        score.setPlanScore(this.getPlanCalculator(candidate.getProposals()));
 
-        finalScore = Math.round(finalScore * 100.0) / 100.0;
+        candidate.setScores(score);
+        recalculateFinalScore(candidate);
 
-        return new CompositeScore(
-                p1Judicial,
-                p2Transparency,
-                p3Contribution,
-                p4Trust,
-                finalScore
-        );
+        return score;
+    }
+
+    public void recalculateFinalScore(Candidate candidate) {
+
+        CompositeScore s = candidate.getScores();
+        if (s == null) return;
+
+        double p1Judicial = s.getJudicialScore();
+        double p2Transparency = s.getTransparencyScore();
+        double p3Contribution = s.getContributionScore();
+        double p4Trust = s.getTrustScore();
+        double p5Plan = s.getPlanScore();
+
+        double finalScore =
+                (p1Judicial * 0.40) +
+                        (p5Plan * 0.20) +
+                        (p2Transparency * 0.15) +
+                        (p4Trust * 0.15) +
+                        (p3Contribution * 0.10);
+
+        // Penalizaciones estructurales
+        if (p1Judicial < 50.0) {
+            finalScore *= 0.5;
+        }
+
+        if (p5Plan < 40.0) {
+            finalScore -= 10.0;
+        }
+
+        finalScore = Math.max(0.0, round2(finalScore));
+
+        s.setFinalScore(finalScore);
     }
 
     public int determineRankingLevel(double finalScore) {
-        if (finalScore >= 85) return 1;
-        if (finalScore >= 65) return 2;
-        if (finalScore >= 40) return 3;
-        return 4;
+        if (finalScore >= 85) return 1; // Oro
+        if (finalScore >= 65) return 2; // Plata
+        if (finalScore >= 40) return 3; // Bronce
+        return 4; // Rojo
+    }
+
+    public double getPlanCalculator(List<Proposal> proposals) {
+        return planCalculator.calculate(proposals);
+    }
+
+    public double getTrustCalculator(Trust trust) {
+        return trustCalculator.calculate(trust);
+    }
+
+    public double getJudicialCalculator(List<LegalHistoryEntry> history) {
+        return judicialCalculator.calculate(history);
+    }
+
+    public double getTransparencyCalculator(Transparency transparency) {
+        return transparencyCalculator.calculate(transparency);
+    }
+
+    public double getContributionCalculator(List<Achievement> achievements) {
+        return Math.min((contributionCalculator.calculate(achievements)/50.0) * 100.00, 100.00);
+    }
+
+    private double round2(double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 }
-

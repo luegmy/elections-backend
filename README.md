@@ -1,111 +1,66 @@
-# 🗳️ Plataforma de Consulta Electoral – Perú 2026
+# 🗳️ Electoral Integrity Scoring Engine (EISE) - Perú 2026
 
-### Información pública estructurada para una ciudadanía informada
+![Licencia](https://img.shields.io/badge/Licencia-MIT-green)
+![Java](https://img.shields.io/badge/Java-17%2B-blue)
+![Status](https://img.shields.io/badge/Estado-Beta%20Cívico-orange)
 
-Esta plataforma es un **sistema backend de consulta ciudadana** orientado a centralizar, estructurar y presentar información pública sobre candidatos electorales del Perú, con el objetivo de **facilitar el acceso a datos relevantes sin interpretaciones políticas ni recomendaciones electorales**.
+### *Auditoría algorítmica y centralización de datos públicos para un voto informado.*
 
-El sistema **no emite juicios de valor**, **no recomienda candidatos** y **no reemplaza** a las entidades oficiales del sistema electoral peruano. Su propósito es **informativo y técnico**.
-
----
-
-## 🎯 Propósito del Proyecto
-
-En el contexto electoral, la información sobre candidatos suele encontrarse **dispersa, fragmentada y presentada en formatos poco accesibles**.  
-Esta plataforma busca:
-
-- Reducir la fricción de acceso a información pública electoral.
-- Estandarizar datos provenientes de distintas fuentes oficiales.
-- Presentar perfiles claros y auditables para **consulta ciudadana**.
-- Servir como **caso de estudio técnico** en análisis de datos cívicos.
+El **EISE** es un framework de código abierto diseñado para transformar la dispersión informativa en métricas comparables. Este sistema procesa datos judiciales, financieros y programáticos de los candidatos a las Elecciones Generales 2026, permitiendo al ciudadano visualizar el "riesgo de integridad" de cada postulación.
 
 ---
 
-## 🧠 Motor de Análisis Informativo (Marco Klitgaard)
+## 🏛️ Propósito y Alcance
+En el ecosistema electoral peruano, la información de un candidato reside en al menos 5 plataformas distintas. Este proyecto actúa como un **interfaz de consolidación** que:
+* **Centraliza** registros de la Ventanilla Única (JNE), ONPE y portales de transparencia.
+* **Analiza** la viabilidad técnica de los planes de gobierno.
+* **Alerta** sobre inconsistencias éticas o riesgos judiciales críticos.
 
-El núcleo del sistema es un motor de análisis informativo inspirado en el **marco conceptual de Robert Klitgaard**, adaptado como **modelo de observación y ponderación de información pública**, no como sistema sancionador.
-
-El análisis se organiza en **cuatro pilares informativos**, cada uno con un peso relativo configurable:
-
-| Pilar | Peso | Componente | Enfoque |
-|-----|------|-----------|--------|
-| Judicial | 40% | `JudicialScoreCalculator` | Estado y severidad informativa de procesos públicos registrados |
-| Transparencia | 25% | `TransparencyScoreCalculator` | Nivel de cumplimiento de declaraciones y registros públicos |
-| Contribución / Trayectoria | 15% | `ContributionScoreCalculator` | Experiencia académica, legislativa y participación documentada |
-| Confianza / Observaciones | 20% | `TrustScoreCalculator` | Observaciones públicas, sanciones éticas y verificaciones externas |
-
-> ⚠️ **Importante:**  
-> Este análisis **no determina culpabilidad**, **no reemplaza decisiones judiciales** y **respeta el principio de presunción de inocencia**.  
-> Los valores reflejan **exposición informativa**, no sentencias.
+> **Nota Legal:** Este software es una herramienta de análisis independiente. No constituye una calificación oficial del Estado Peruano. Los datos son obtenidos de fuentes de acceso público.
 
 ---
 
-## 🔍 Búsqueda Ciudadana Inteligente
+## 🧠 Arquitectura del Scoring
+El motor de cálculo (`ScoringEngine`) opera bajo un modelo de **Ponderación Multidimensional**:
 
-El sistema implementa un motor de búsqueda avanzado basado en **MongoDB Atlas Search**, optimizado para consultas ciudadanas amplias y no técnicas.
+### 1. Ejes de Evaluación
+| Dimensión | Peso | Factor Crítico |
+| :--- | :---: | :--- |
+| **Integridad Judicial** | 35% | Sentencias, procesos vigentes e investigaciones fiscales. |
+| **Viabilidad del Plan** | 20% | Relación entre Impacto Social y Factibilidad Legal/Económica. |
+| **Consistencia Ética** | 20% | Transfuguismo (Party Switches), sanciones y fact-checking. |
+| **Transparencia Activa** | 15% | Declaraciones juradas y registros de asistencia previa. |
+| **Trayectoria (Aportes)** | 10% | Grados académicos y experiencia en gestión pública. |
 
-### Características principales:
-
-- **Prioridad Programática:**  
-  Las propuestas de planes de gobierno reciben mayor relevancia en las búsquedas temáticas (ej. seguridad, economía, educación).
-
-- **Contexto del Resultado:**  
-  Cada coincidencia incluye metadatos que explican **por qué** aparece un resultado (propuesta, trayectoria, referencia pública).
-
-- **Sanitización y estabilidad:**  
-  Las consultas son normalizadas para evitar errores, inyecciones o resultados inconsistentes.
-
----
-
-## 📊 Niveles de Perfil Informativo
-
-Tras procesar los pilares, el sistema asigna un **nivel de perfil informativo**, utilizado únicamente como **clasificación descriptiva**:
-
-- **Nivel 1:** Información consistente y completa.
-- **Nivel 2:** Observaciones menores registradas.
-- **Nivel 3:** Observaciones relevantes activas.
-- **Nivel 4:** Alta exposición a procesos o controversias públicas.
-- **Nivel 5:** Múltiples observaciones públicas simultáneas.
-
-> Estos niveles **no constituyen recomendaciones** ni evaluaciones políticas.
+### 2. El Filtro de Seguridad (Circuit Breaker)
+El algoritmo implementa un **bloqueo de integridad**: Si el sub-puntaje de *Integridad Judicial* es menor a **50/100**, el puntaje final total sufre una reducción del **50%**. Esto asegura que ningún logro académico o promesa de plan de gobierno pueda ocultar un historial judicial grave.
 
 ---
 
-## 🛠️ Arquitectura Técnica
+## 📊 Niveles de Ranking
+El sistema clasifica el resultado final en cuatro niveles de recomendación:
 
-- **Backend:** Spring Boot 3 (Java)
-- **Persistencia:** MongoDB (modelo flexible para hojas de vida dinámicas)
-- **Mapeo de datos:** MapStruct
-- **Diseño:** Arquitectura orientada a servicios
-- **Auditoría:**
-    - `lastAuditDate` – última actualización del perfil
-    - `dataSourceVersion` – versión y origen de los datos
+* **Nivel 1 (85 - 100):** Candidato con alta solvencia ética y técnica.
+* **Nivel 2 (65 - 84):** Candidato apto con observaciones menores.
+* **Nivel 3 (40 - 64):** Candidato con riesgos moderados (judiciales o técnicos).
+* **Nivel 4 (0 - 39):** Candidato de alto riesgo o no recomendado.
 
 ---
 
-## 🛡️ Principios de Neutralidad y Veracidad
-
-1. **Fuentes públicas verificables**  
-   Toda la información proviene de registros públicos u observables oficiales.
-
-2. **Neutralidad algorítmica**  
-   El sistema calcula y clasifica; **no interpreta ni recomienda**.
-
-3. **Trazabilidad completa**  
-   Cada perfil incluye referencia temporal y versión de la fuente utilizada.
-
-4. **Configuración transparente**  
-   Los pesos y reglas del motor están definidos en archivos de configuración, no en lógica opaca.
+## 🛠️ Especificaciones Técnicas
+El sistema está construido pensando en la transparencia total del código (**Open Logic**):
+- **Core:** Java 17.
+- **Data Engine:** Manejo de perfiles en `JSON`.
+- **Configuración:** Reglas de penalización dinámicas en `YAML`.
+- **Auditoría de Plan:** Lógica de filtrado por barreras constitucionales y tratados internacionales.
 
 ---
 
-## ⚖️ Declaración de Alcance
+## 🤝 Cómo Contribuir
+Este es un proyecto colaborativo. Puedes ayudar:
+1.  **Reportando datos:** Si encuentras un expediente judicial no mapeado.
+2.  **Auditando el Plan:** Ayudando a calificar la viabilidad de las nuevas propuestas.
+3.  **Mejorando el Código:** Optimizando las calculadoras de score.
 
-Este proyecto es:
-- Informativo
-- Técnico
-- Educativo
-
-No es:
-- Un organismo fiscalizador
-- Un sistema de recomendación electoral
-- Un sustituto del sistema judicial o electoral peruano
+---
+*Desarrollado con el fin de fortalecer la democracia y la vigilancia ciudadana.*

@@ -2,10 +2,10 @@ package com.gage.elections.service;
 
 import com.gage.elections.controller.dto.CandidateCreateRequest;
 import com.gage.elections.controller.dto.MatchResponse;
-import com.gage.elections.service.mapper.CandidateMapper;
-import com.gage.elections.service.mapper.MatchMapper;
 import com.gage.elections.model.candidate.*;
 import com.gage.elections.repository.CandidateRepository;
+import com.gage.elections.service.mapper.CandidateMapper;
+import com.gage.elections.service.mapper.MatchMapper;
 import com.gage.elections.util.SearchUtils;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
@@ -26,60 +28,101 @@ public class CandidateService {
     private final MongoTemplate mongoTemplate;
     private final MatchMapper matchMapper;
     private final CandidateMapper candidateMapper;
-    private static final String FIELD_SCORE = "score";
+    private final SequenceGeneratorService generateSequence;
 
-    public void createCandidate(CandidateCreateRequest candidate) {
-
-        Candidate candidateCreated = candidateMapper.toCandidate(candidate);
-
-        recalculateScore(candidateCreated);
-
-        candidateRepository.save(candidateCreated);
+    public void createCandidate(CandidateCreateRequest request) {
+        Candidate candidate = candidateMapper.toCandidate(request);
+        long seq = generateSequence.generateSequence("candidate_sequence");
+        candidate.setCode(String.valueOf(seq));
+        recalculateScore(candidate);
+        candidateRepository.save(candidate);
     }
+
     public void createCandidates(List<Candidate> candidates) {
-
         candidates.forEach(this::recalculateScore);
-
         candidateRepository.saveAll(candidates);
     }
 
-    public Candidate updateCandidate(String id, Candidate candidate) {
-
-        candidate.setCode(id);
+    public Candidate updateCandidate(String code, Candidate candidate) {
+        candidate.setCode(code);
         recalculateScore(candidate);
-
         return candidateRepository.save(candidate);
     }
 
     public Candidate updateHistory(String code, List<LegalHistoryEntry> history) {
-        Candidate c = getCandidateByCode(code);
-        c.setHistory(history);
-        return candidateRepository.save(c);
+        return updateCandidate(code, c -> {
+            c.getScores().setJudicialScore(
+                    scoringService.getJudicialCalculator(history)
+            );
+            c.setHistory(history);
+        });
     }
 
     public Candidate updateProposals(String code, List<Proposal> proposals) {
-        Candidate c = getCandidateByCode(code);
-        c.setProposals(proposals);
-        return candidateRepository.save(c);
+        return updateCandidate(code, c -> {
+            c.getScores().setPlanScore(
+                    scoringService.getPlanCalculator(proposals)
+            );
+            c.setProposals(proposals);
+        });
     }
 
     public Candidate updateTrust(String code, Trust trust) {
-        Candidate c = getCandidateByCode(code);
-        c.setTrust(trust);
-        return candidateRepository.save(c);
+        return updateCandidate(code, c -> {
+            c.getScores().setTrustScore(
+                    scoringService.getTrustCalculator(trust)
+            );
+            c.setTrust(trust);
+        });
     }
 
     public Candidate updateAchievements(String code, List<Achievement> achievements) {
-        Candidate c = getCandidateByCode(code);
-        c.setAchievements(achievements);
-        return candidateRepository.save(c);
+        return updateCandidate(code, c -> {
+            c.getScores().setContributionScore(
+                    scoringService.getContributionCalculator(achievements)
+            );
+            c.setAchievements(achievements);
+        });
     }
 
     public Candidate updateTransparency(String code, Transparency transparency) {
-        Candidate c = getCandidateByCode(code);
-        c.setTransparency(transparency);
-        return candidateRepository.save(c);
+        return updateCandidate(code, c -> {
+            c.getScores().setTransparencyScore(
+                    scoringService.getTransparencyCalculator(transparency)
+            );
+            c.setTransparency(transparency);
+        });
     }
+
+    private void recalculateScore(Candidate candidate) {
+        CompositeScore scores = scoringService.calculateAll(candidate);
+        int level = scoringService.determineRankingLevel(scores.getFinalScore());
+        candidate.updateScoring(scores, level);
+    }
+
+    private Candidate updateCandidate(String code, Consumer<Candidate> updater) {
+
+        Candidate candidate = getCandidateByCode(code);
+        ensureScoreInitialized(candidate);
+
+        updater.accept(candidate);
+
+        scoringService.recalculateFinalScore(candidate);
+        candidate.setRankingLevel(
+                scoringService.determineRankingLevel(
+                        candidate.getScores().getFinalScore()
+                )
+        );
+
+        return candidateRepository.save(candidate);
+    }
+
+    private void ensureScoreInitialized(Candidate candidate) {
+        if (candidate.getScores() == null) {
+            candidate.setScores(new CompositeScore());
+        }
+    }
+
 
     public List<Candidate> findAll() {
         return candidateRepository.findAll();
@@ -93,9 +136,7 @@ public class CandidateService {
     public List<MatchResponse> searchCandidatesAtlas(String rawQuery) {
 
         String query = sanitizeAndValidate(rawQuery);
-        if (query == null) {
-            return Collections.emptyList();
-        }
+        if (query == null) return Collections.emptyList();
 
         Aggregation aggregation = Aggregation.newAggregation(
                 buildAtlasSearchStage(query),
@@ -106,30 +147,17 @@ public class CandidateService {
                 .aggregate(aggregation, "candidates", Candidate.class)
                 .getMappedResults()
                 .stream()
-                .map(candidate -> matchMapper.toMatchResponse(candidate, query))
+                .map(c -> matchMapper.toMatchResponse(c, query)) // Devuelve Optional<MatchResponse>
+                .flatMap(Optional::stream)                      // Convierte Optional a Stream y filtra vacíos
                 .toList();
     }
 
-
-    private void recalculateScore(Candidate candidate) {
-
-        CompositeScore newScores = scoringService.calculateAll(candidate);
-        int level = scoringService.determineRankingLevel(newScores.getFinalScore());
-
-        candidate.updateScoring(newScores, level);
-    }
-
     private String sanitizeAndValidate(String rawQuery) {
-
         String sanitized = SearchUtils.sanitize(rawQuery);
-
-        return SearchUtils.isValid(sanitized)
-                ? sanitized
-                : null;
+        return SearchUtils.isValid(sanitized) ? sanitized : null;
     }
 
     private AggregationOperation buildAtlasSearchStage(String query) {
-
         return context -> new Document("$search",
                 new Document("index", "default")
                         .append("compound", new Document("should", List.of(
@@ -140,11 +168,7 @@ public class CandidateService {
     }
 
     private Document searchInPlanKeywords(String query) {
-        return createTextSearch(
-                query,
-                List.of("planKeywords"),
-                2.0
-        );
+        return createTextSearch(query, List.of("proposals.keywords"), 2.0);
     }
 
     private Document searchInCandidateProfile(String query) {
@@ -155,6 +179,7 @@ public class CandidateService {
                         "position",
                         "proposals.title",
                         "proposals.description",
+                        "proposals.detailDescription",
                         "history.title",
                         "history.description"
                 ),
@@ -163,7 +188,6 @@ public class CandidateService {
     }
 
     private Document createTextSearch(String query, List<String> paths, double boost) {
-
         Document text = new Document()
                 .append("query", query)
                 .append("path", paths.size() == 1 ? paths.get(0) : paths)
@@ -177,4 +201,3 @@ public class CandidateService {
         return new Document("text", text);
     }
 }
-

@@ -4,76 +4,130 @@ import com.gage.elections.controller.dto.MatchResponse;
 import com.gage.elections.model.candidate.Candidate;
 import com.gage.elections.model.candidate.LegalHistoryEntry;
 import com.gage.elections.model.candidate.Proposal;
+import com.gage.elections.util.SearchUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
 import java.util.Optional;
-
 @Mapper(componentModel = "spring")
 public abstract class MatchMapper {
 
     @Mapping(target = "matchType", ignore = true)
-    @Mapping(target = "matchSnippet", ignore = true)
+    @Mapping(target = "matchTitle", ignore = true)
+    @Mapping(target = "matchDescription", ignore = true)
+    @Mapping(target = "matchDetailDescription", ignore = true)
+    @Mapping(target = "sourcePlan", ignore = true)
     @Mapping(target = "finalScore", source = "candidate.scores.finalScore")
     protected abstract MatchResponse mapCommonFields(Candidate candidate);
 
-    public MatchResponse toMatchResponse(Candidate candidate, String search) {
-        if (candidate == null) return null;
+    public Optional<MatchResponse> toMatchResponse(Candidate candidate, String search) {
+        if (candidate == null || search == null || search.isBlank()) {
+            return Optional.empty();
+        }
 
-        MatchResponse dto = mapCommonFields(candidate);
-        String query = search != null ? search.toLowerCase().trim() : "";
+        MatchResponse base = mapCommonFields(candidate);
+        String query = SearchUtils.normalize(search);
 
+        // Caso 1: Match en Propuestas
+        Optional<Proposal> proposalMatch = findProposalMatch(candidate, query);
+        if (proposalMatch.isPresent()) {
+            Proposal p = proposalMatch.get();
+            return Optional.of(rebuild(
+                    base,
+                    "PROPUESTA:",
+                    p.getTitle(),
+                    p.getDescription(),
+                    p.getDetailDescription(),
+                    p.getSourcePlan()
+            ));
+        }
+
+        // Caso 2: Match en Antecedentes Judiciales
+        Optional<LegalHistoryEntry> historyMatch = findLegalHistoryMatch(candidate, query);
+        if (historyMatch.isPresent()) {
+            LegalHistoryEntry h = historyMatch.get();
+            return Optional.of(rebuild(
+                    base,
+                    "ANTECEDENTE:",
+                    h.getTitle(),
+                    h.getExpedientNumber(),
+                    h.getDescription(),
+                    h.getSource()
+            ));
+        }
+
+        // Caso 3: Match por Nombre
         if (contains(candidate.getName(), query)) {
-            return rebuild(dto, "NOMBRE", "Candidato: " + candidate.getName());
+            return Optional.of(rebuild(
+                    base,
+                    "POSICION:",
+                    candidate.getName(),
+                    candidate.getParty(),
+                    candidate.getBiography(),
+                    candidate.getPosition()
+            ));
         }
 
-        if (containsAny(candidate.getPlanKeywords(), query)) {
-            return rebuild(dto, "PLAN_GOBIERNO", "Coincidencia en palabras clave del plan estratégico.");
-        }
-
-        return findProposalMatch(candidate, query)
-                .map(p -> rebuild(dto, "PROPUESTA", p.getTitle() + ": " + p.getDescription()))
-                .orElseGet(() ->
-                        findLegalHistoryMatch(candidate, query)
-                                .map(h -> rebuild(dto, "ANTECEDENTE", h.getTitle() + ": " + h.getDescription()))
-                                .orElse(rebuild(dto, "GENERAL", "Perfil del candidato verificado."))
-                );
+        return Optional.empty();
     }
 
-    private MatchResponse rebuild(MatchResponse b, String type, String snippet) {
-        return new MatchResponse(
-                b.code(),
-                b.name(),
-                b.party(),
-                b.partyAcronym(),
-                b.position(),
-                type,
-                snippet,
-                b.finalScore(),
-                b.rankingLevel()
-        );
-    }
 
     private Optional<Proposal> findProposalMatch(Candidate candidate, String query) {
         if (candidate.getProposals() == null) return Optional.empty();
+
         return candidate.getProposals().stream()
-                .filter(p -> contains(p.getTitle(), query) || contains(p.getDescription(), query))
+                .filter(p ->
+                        contains(p.getTitle(), query) ||
+                                contains(p.getDescription(), query) ||
+                                contains(p.getDetailDescription(), query) ||
+                                containsAny(p.getKeywords(), query)
+                )
                 .findFirst();
     }
 
     private Optional<LegalHistoryEntry> findLegalHistoryMatch(Candidate candidate, String query) {
         if (candidate.getHistory() == null) return Optional.empty();
+
         return candidate.getHistory().stream()
-                .filter(h -> contains(h.getTitle(), query) || contains(h.getDescription(), query))
+                .filter(h ->
+                        contains(h.getTitle(), query) ||
+                                contains(h.getDescription(), query)
+                )
                 .findFirst();
     }
 
     private boolean contains(String field, String query) {
-        return field != null && field.toLowerCase().contains(query);
+        if (field == null) return false;
+        return SearchUtils.normalize(field).contains(query);
     }
 
     private boolean containsAny(List<String> list, String query) {
-        return list != null && list.stream().anyMatch(v -> contains(v, query));
+        if (list == null) return false;
+        return list.stream().anyMatch(v -> contains(v, query));
+    }
+
+    private MatchResponse rebuild(
+            MatchResponse base,
+            String type,
+            String matchTitle,
+            String matchDescription,
+            String matchDetailDescription,
+            String sourcePlan
+    ) {
+        return new MatchResponse(
+                base.code(),
+                base.name(),
+                base.party(),
+                base.partyAcronym(),
+                base.position(),
+                type,
+                matchTitle,
+                matchDescription,
+                matchDetailDescription,
+                sourcePlan,
+                base.finalScore(),
+                base.rankingLevel()
+        );
     }
 }
