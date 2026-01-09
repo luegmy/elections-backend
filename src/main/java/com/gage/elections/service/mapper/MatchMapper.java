@@ -8,7 +8,6 @@ import com.gage.elections.util.SearchUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.List;
 import java.util.Optional;
 @Mapper(componentModel = "spring")
 public abstract class MatchMapper {
@@ -29,7 +28,6 @@ public abstract class MatchMapper {
         MatchResponse base = mapCommonFields(candidate);
         String query = SearchUtils.normalize(search);
 
-        // Caso 1: Match en Propuestas
         Optional<Proposal> proposalMatch = findProposalMatch(candidate, query);
         if (proposalMatch.isPresent()) {
             Proposal p = proposalMatch.get();
@@ -43,7 +41,6 @@ public abstract class MatchMapper {
             ));
         }
 
-        // Caso 2: Match en Antecedentes Judiciales
         Optional<LegalHistoryEntry> historyMatch = findLegalHistoryMatch(candidate, query);
         if (historyMatch.isPresent()) {
             LegalHistoryEntry h = historyMatch.get();
@@ -57,8 +54,29 @@ public abstract class MatchMapper {
             ));
         }
 
-        // Caso 3: Match por Nombre
-        if (contains(candidate.getName(), query)) {
+        if (SearchUtils.contains(candidate.getName(), query)) {
+            return Optional.of(rebuild(
+                    base,
+                    "POSICION:",
+                    candidate.getName(),
+                    candidate.getParty(),
+                    candidate.getBiography(),
+                    candidate.getPosition()
+            ));
+        }
+
+        if (SearchUtils.contains(candidate.getBiography(), query)) {
+            return Optional.of(rebuild(
+                    base,
+                    "POSICION:",
+                    candidate.getName(),
+                    candidate.getParty(),
+                    candidate.getBiography(),
+                    candidate.getPosition()
+            ));
+        }
+
+        if (SearchUtils.contains(candidate.getPosition(), query)) {
             return Optional.of(rebuild(
                     base,
                     "POSICION:",
@@ -72,16 +90,15 @@ public abstract class MatchMapper {
         return Optional.empty();
     }
 
-
     private Optional<Proposal> findProposalMatch(Candidate candidate, String query) {
         if (candidate.getProposals() == null) return Optional.empty();
 
         return candidate.getProposals().stream()
                 .filter(p ->
-                        contains(p.getTitle(), query) ||
-                                contains(p.getDescription(), query) ||
-                                contains(p.getDetailDescription(), query) ||
-                                containsAny(p.getKeywords(), query)
+                        SearchUtils.contains(p.getTitle(), query) ||
+                                SearchUtils.contains(p.getDescription(), query) ||
+                                SearchUtils.contains(p.getDetailDescription(), query) ||
+                                p.getKeywords().stream().anyMatch(k->SearchUtils.contains(k,query))
                 )
                 .findFirst();
     }
@@ -91,20 +108,10 @@ public abstract class MatchMapper {
 
         return candidate.getHistory().stream()
                 .filter(h ->
-                        contains(h.getTitle(), query) ||
-                                contains(h.getDescription(), query)
+                        SearchUtils.contains(h.getTitle(), query) ||
+                                SearchUtils.contains(h.getDescription(), query)
                 )
                 .findFirst();
-    }
-
-    private boolean contains(String field, String query) {
-        if (field == null) return false;
-        return SearchUtils.normalize(field).contains(query);
-    }
-
-    private boolean containsAny(List<String> list, String query) {
-        if (list == null) return false;
-        return list.stream().anyMatch(v -> contains(v, query));
     }
 
     private MatchResponse rebuild(

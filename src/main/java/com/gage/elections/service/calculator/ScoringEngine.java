@@ -1,7 +1,6 @@
-package com.gage.elections.service;
+package com.gage.elections.service.calculator;
 
 import com.gage.elections.model.candidate.*;
-import com.gage.elections.service.calculator.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +19,9 @@ public class ScoringEngine {
 
     public CompositeScore calculateAll(Candidate candidate) {
 
-        CompositeScore score = new CompositeScore();
+        CompositeScore score = (candidate.getScores() != null)
+                ? candidate.getScores()
+                : new CompositeScore();
 
         score.setJudicialScore(this.getJudicialCalculator(candidate.getHistory()));
         score.setTransparencyScore(this.getTransparencyCalculator(candidate.getTransparency()));
@@ -28,7 +29,6 @@ public class ScoringEngine {
         score.setTrustScore(this.getTrustCalculator(candidate.getTrust()));
         score.setPlanScore(this.getPlanCalculator(candidate.getProposals()));
 
-        candidate.setScores(score);
         recalculateFinalScore(candidate);
 
         return score;
@@ -45,32 +45,25 @@ public class ScoringEngine {
         double p4Trust = s.getTrustScore();
         double p5Plan = s.getPlanScore();
 
-        double finalScore =
-                (p1Judicial * 0.40) +
-                        (p5Plan * 0.20) +
-                        (p2Transparency * 0.15) +
-                        (p4Trust * 0.15) +
-                        (p3Contribution * 0.10);
+        double finalScore = (p1Judicial * 0.40) +
+                            (p5Plan * 0.20) +
+                            (p2Transparency * 0.15) +
+                            (p4Trust * 0.15) +
+                            (p3Contribution * 0.10);
 
         // Penalizaciones estructurales
-        if (p1Judicial < 50.0) {
-            finalScore *= 0.5;
-        }
+        if (p1Judicial < 50.0) finalScore *= 0.5;
 
-        if (p5Plan < 40.0) {
-            finalScore -= 10.0;
-        }
+        if (p5Plan < 40.0) finalScore -= 10.0;
 
-        finalScore = Math.max(0.0, round2(finalScore));
-
-        s.setFinalScore(finalScore);
+        s.setFinalScore(Math.max(0.0, round2(finalScore)));
     }
 
     public int determineRankingLevel(double finalScore) {
-        if (finalScore >= 85) return 1; // Oro
-        if (finalScore >= 65) return 2; // Plata
-        if (finalScore >= 40) return 3; // Bronce
-        return 4; // Rojo
+        if (finalScore >= 85) return 1;
+        if (finalScore >= 65) return 2;
+        if (finalScore >= 40) return 3;
+        return 4;
     }
 
     public double getPlanCalculator(List<Proposal> proposals) {

@@ -47,4 +47,18 @@ public class SearchUtils {
                 .toLowerCase()
                 .trim();
     }
+
+    public static boolean contains(String field, String query) {
+        if (field == null || query == null) return false;
+
+        String normalizedField = normalize(field);
+        String normalizedQuery = normalize(query);
+
+        // Dividimos la búsqueda en palabras (ej: ["rafael", "lopez"])
+        String[] tokens = normalizedQuery.split("\\s+");
+
+        // Verificamos que CADA palabra de la búsqueda esté en el campo
+        return Arrays.stream(tokens).anyMatch(normalizedField::contains);
+    }
+
 }

@@ -2,6 +2,8 @@ package com.gage.elections.model.candidate;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
@@ -12,7 +14,11 @@ import java.util.List;
 @Setter
 @Document(collection = "candidates")
 public class Candidate {
-    @MongoId
+
+    @Transient
+    public static final String SEQUENCE_NAME = "candidate_sequence";
+
+    @Id
     private String code;
     private String name;
     private String position; // Cargo al que postula (Presidente, Congresista, etc.)
