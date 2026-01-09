@@ -97,10 +97,18 @@ electoral:
           2: 15.0
           3: 30
 
+    plan:
+      costEstimateHigh: 0.8
+      requiresConstitutionalReform: 0.4
+      violatesInternationalTreaties: 0.2
+
 logging:
   level:
     root: INFO
-    org.springframework.data.mongodb.core.MongoTemplate: WARN
-    org.mongodb.driver: WARN
-
+    # Permite ver las consultas de agregación y comandos enviados
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+    # Permite ver la comunicación a nivel de driver (opcional, genera mucho texto)
+    org.mongodb.driver.protocol.command: DEBUG
+    # Para ver exactamente qué está mapeando Spring
+    org.springframework.data.mongodb.core.convert.MappingMongoConverter: INFO
 

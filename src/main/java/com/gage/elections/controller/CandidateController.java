@@ -1,7 +1,7 @@
 package com.gage.elections.controller;
 
 
-import com.gage.elections.controller.dto.CandidateCreateRequest;
+import com.gage.elections.controller.dto.request.CandidateCreateRequest;
 import com.gage.elections.controller.dto.MatchResponse;
 import com.gage.elections.model.candidate.*;
 import com.gage.elections.service.CandidateService;
@@ -13,7 +13,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/candidates")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {
+        "http://localhost:4200",
+        "https://elecciones2026.onrender.com/"
+        })
 @RequiredArgsConstructor
 public class CandidateController {
 
@@ -31,7 +34,7 @@ public class CandidateController {
         return ResponseEntity.ok("Candidatos agregados correctamente");
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Candidate> update(
             @PathVariable String id,
             @RequestBody Candidate candidate) {

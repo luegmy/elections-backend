@@ -1,12 +1,17 @@
 package com.gage.elections.service.calculator;
 
+import com.gage.elections.config.properties.PlanProperties;
 import com.gage.elections.model.candidate.Proposal;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Component
 public class PlanScoreCalculator {
+
+    private PlanProperties props;
 
     public double calculate(List<Proposal> proposals) {
         if (proposals == null || proposals.isEmpty()) return 0.0;
@@ -20,7 +25,7 @@ public class PlanScoreCalculator {
             double proposalScore = p.getImpactScore() * realFeasibility;
 
             if ("Muy Alto".equalsIgnoreCase(p.getCostEstimate())) {
-                proposalScore *= 0.8;
+                proposalScore *= props.getCostEstimate();
             }
 
             totalWeightedScore += proposalScore;
@@ -35,11 +40,11 @@ public class PlanScoreCalculator {
         double baseFeasibility = p.getFeasibilityScore();
 
         if (p.isRequiresConstitutionalReform()) {
-            baseFeasibility *= 0.4; // Dependencia total del Congreso
+            baseFeasibility *= props.getRequiresConstitutionalReform();
         }
 
         if (p.isViolatesInternationalTreaties()) {
-            baseFeasibility *= 0.2; // Barrera diplomática y jurídica internacional
+            baseFeasibility *= props.getViolatesInternationalTreaties();
         }
 
         return baseFeasibility;

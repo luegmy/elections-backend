@@ -1,4 +1,9 @@
-package com.gage.elections.controller.dto;
+package com.gage.elections.controller.dto.request;
+
+import com.gage.elections.controller.dto.AchievementRequest;
+import com.gage.elections.controller.dto.ProposalRequest;
+import com.gage.elections.controller.dto.TransparencyRequest;
+import com.gage.elections.controller.dto.TrustRequest;
 
 import java.util.List;
 
