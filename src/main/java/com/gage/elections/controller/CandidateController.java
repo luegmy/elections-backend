@@ -13,9 +13,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/candidates")
-@CrossOrigin(origins = {
+@CrossOrigin(origins =
+        {
         "http://localhost:4200",
-        "https://elecciones2026.onrender.com/"
+        "https://eleccionesperu2026.vercel.app/"
         })
 @RequiredArgsConstructor
 public class CandidateController {
