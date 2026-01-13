@@ -1,6 +1,7 @@
 package com.gage.elections.config.properties;
 
 import com.gage.elections.model.scoring.IncidentSeverity;
+import com.gage.elections.model.scoring.LegalCategory;
 import com.gage.elections.model.scoring.LegalStatus;
 import com.gage.elections.model.scoring.RuleKey;
 import jakarta.annotation.PostConstruct;
@@ -28,7 +29,7 @@ public class JudicialProperties {
         if (penalties == null) return;
         for (PenaltyRuleItem item : penalties) {
             penaltyMap.put(
-                    new RuleKey(item.getStatus(), item.getSeverity()),
+                    new RuleKey(item.getStatus(), item.getSeverity(), item.getCategory()),
                     item.getValue()
             );
         }
@@ -39,6 +40,7 @@ public class JudicialProperties {
     public static class PenaltyRuleItem {
         private LegalStatus status;
         private IncidentSeverity severity;
+        private LegalCategory category;
         private double value;
     }
 }

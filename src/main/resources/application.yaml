@@ -8,70 +8,193 @@ spring:
     mongodb:
       uri: ${MONGO_URI}
 
-  servlet:
-    multipart:
-      max-file-size: 100MB
-      max-request-size: 100MB
-
 electoral:
+  weights:
+    judicial: 0.40
+    plan: 0.20
+    transparency: 0.15
+    trust: 0.15
+    contribution: 0.10
   scoring:
     judicial:
       base-score: 100.0
       penalties:
-        - status: SENTENCIA_FIRME_CONDENATORIA
+        # =========================================================
+        # CATEGORÍA: PENAL (Corrupción, Robo, Homicidio, etc.)
+        # Impacto: Máximo. Dos sentencias firmes anulan el pilar.
+        # =========================================================
+        - category: PENAL
+          status: SENTENCIA_FIRME_CONDENATORIA
           severity: GRAVE
           value: 50.0
-        - status: SENTENCIA_PRIMERA_INSTANCIA
+        - category: PENAL
+          status: SENTENCIA_PRIMERA_INSTANCIA
           severity: GRAVE
           value: 35.0
-        - status: PROCESO_JUDICIAL_ABIERTO
+        - category: PENAL
+          status: PROCESO_JUDICIAL_ABIERTO
           severity: GRAVE
           value: 20.0
-        - status: INVESTIGACION_PRELIMINAR
+        - category: PENAL
+          status: INVESTIGACION_PRELIMINAR
           severity: GRAVE
           value: 10.0
 
-        - status: SENTENCIA_FIRME_CONDENATORIA
+        - category: PENAL
+          status: SENTENCIA_FIRME_CONDENATORIA
           severity: MODERADO
           value: 30.0
-        - status: SENTENCIA_PRIMERA_INSTANCIA
+        - category: PENAL
+          status: SENTENCIA_PRIMERA_INSTANCIA
           severity: MODERADO
           value: 21.0
-        - status: PROCESO_JUDICIAL_ABIERTO
+        - category: PENAL
+          status: PROCESO_JUDICIAL_ABIERTO
           severity: MODERADO
           value: 12.0
-        - status: INVESTIGACION_PRELIMINAR
+        - category: PENAL
+          status: INVESTIGACION_PRELIMINAR
           severity: MODERADO
           value: 6.0
 
-        - status: SENTENCIA_FIRME_CONDENATORIA
+        - category: PENAL
+          status: SENTENCIA_FIRME_CONDENATORIA
           severity: LEVE
           value: 10.0
-        - status: SENTENCIA_PRIMERA_INSTANCIA
+        - category: PENAL
+          status: SENTENCIA_PRIMERA_INSTANCIA
           severity: LEVE
           value: 7.0
-        - status: PROCESO_JUDICIAL_ABIERTO
+        - category: PENAL
+          status: PROCESO_JUDICIAL_ABIERTO
           severity: LEVE
           value: 4.0
-        - status: INVESTIGACION_PRELIMINAR
+        - category: PENAL
+          status: INVESTIGACION_PRELIMINAR
           severity: LEVE
           value: 2.0
+
+        # =========================================================
+        # CATEGORÍA: FAMILIA (Alimentos, Violencia Familiar)
+        # Impacto: Muy Alto. Refleja la integridad moral básica.
+        # =========================================================
+        - category: FAMILIA
+          status: SENTENCIA_FIRME_CONDENATORIA
+          severity: GRAVE
+          value: 40.0
+        - category: FAMILIA
+          status: SENTENCIA_PRIMERA_INSTANCIA
+          severity: GRAVE
+          value: 28.0
+        - category: FAMILIA
+          status: PROCESO_JUDICIAL_ABIERTO
+          severity: MODERADO
+          value: 10.0
+        - category: FAMILIA
+          status: INVESTIGACION_PRELIMINAR
+          severity: LEVE
+          value: 3.0
+
+        # =========================================================
+        # CATEGORÍA: TRIBUTARY (Deudas SUNAT, Evasión)
+        # Impacto: Medio-Alto. Responsabilidad con el tesoro público.
+        # =========================================================
+        - category: TRIBUTARY
+          status: SENTENCIA_FIRME_CONDENATORIA
+          severity: MODERADO
+          value: 25.0
+        - category: TRIBUTARY
+          status: SENTENCIA_PRIMERA_INSTANCIA
+          severity: MODERADO
+          value: 18.0
+        - category: TRIBUTARY
+          status: PROCESO_JUDICIAL_ABIERTO
+          severity: LEVE
+          value: 7.0
+        - category: TRIBUTARY
+          status: INVESTIGACION_PRELIMINAR
+          severity: LEVE
+          value: 2.0
+
+        # =========================================================
+        # CATEGORÍA: LABORAL (Beneficios sociales, despidos)
+        # Impacto: Medio. Respeto a los derechos de los trabajadores.
+        # =========================================================
+        - category: LABORAL
+          status: SENTENCIA_FIRME_CONDENATORIA
+          severity: MODERADO
+          value: 20.0
+        - category: LABORAL
+          status: SENTENCIA_PRIMERA_INSTANCIA
+          severity: MODERADO
+          value: 14.0
+        - category: LABORAL
+          status: PROCESO_JUDICIAL_ABIERTO
+          severity: LEVE
+          value: 5.0
+
+        # =========================================================
+        # CATEGORÍA: ADMINISTRATIVE (Sanciones del Estado, Multas)
+        # Impacto: Bajo-Medio. Cumplimiento de normas estatales.
+        # =========================================================
+        - category: ADMINISTRATIVE
+          status: SENTENCIA_FIRME_CONDENATORIA
+          severity: LEVE
+          value: 15.0
+        - category: ADMINISTRATIVE
+          status: SENTENCIA_PRIMERA_INSTANCIA
+          severity: LEVE
+          value: 10.0
+        - category: ADMINISTRATIVE
+          status: PROCESO_JUDICIAL_ABIERTO
+          severity: LEVE
+          value: 4.0
+
+        # =========================================================
+        # CATEGORÍA: CIVIL (Deudas bancarias, contratos, daños)
+        # Impacto: Bajo. Disputas entre particulares.
+        # =========================================================
+        - category: CIVIL
+          status: SENTENCIA_FIRME_CONDENATORIA
+          severity: LEVE
+          value: 10.0
+        - category: CIVIL
+          status: SENTENCIA_PRIMERA_INSTANCIA
+          severity: LEVE
+          value: 7.0
+        - category: CIVIL
+          status: PROCESO_JUDICIAL_ABIERTO
+          severity: LEVE
+          value: 2.0
+
+        # =========================================================
+        # CASOS NEUTRALES (No restan puntos)
+        # =========================================================
+        - category: PENAL
+          status: SENTENCIA_ABSOLUTORIA
+          severity: LEVE
+          value: 0.0
+        - category: PENAL
+          status: PRESCRITO
+          severity: LEVE
+          value: 0.0
+
     contribution:
       max-sub-score: 50.0
       max-years-experience: 10
-      max-items-allowed: 5
+      max-items-allowed: 5.0
       bonuses:
         academic:
           doctorate: 25.0
           mastery: 15.0
           bachelor: 8.0
-        social-leadership: 15.0
+        socialLeadership: 15.0
         relevance:
           high: 15.0
           medium: 7.0
           low: 2.0
       penalties:
-        promise-broken: 20.0
+        promiseBroken: 20.0
 
     transparency:
       declaration-base: 15.0
@@ -95,12 +218,12 @@ electoral:
           0: 0.0
           1: 5.0
           2: 15.0
-          3: 30
+          3: 30.0
 
     plan:
-      costEstimateHigh: 0.8
-      requiresConstitutionalReform: 0.4
-      violatesInternationalTreaties: 0.2
+      costEstimateHigh: 0.75
+      requiresConstitutionalReform: 0.85
+      violatesInternationalTreaties: 0.1
 
 logging:
   level:

@@ -3,6 +3,7 @@ package com.gage.elections.controller;
 
 import com.gage.elections.controller.dto.request.CandidateCreateRequest;
 import com.gage.elections.controller.dto.MatchResponse;
+import com.gage.elections.controller.dto.request.CandidateUpdateRequest;
 import com.gage.elections.model.candidate.*;
 import com.gage.elections.service.CandidateService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class CandidateController {
     }
 
     @PostMapping("/batch")
-    public ResponseEntity<String> createAll(@RequestBody List<Candidate> candidates) {
+    public ResponseEntity<String> createAll(@RequestBody List<CandidateCreateRequest> candidates) {
         candidateService.createCandidates(candidates);
         return ResponseEntity.ok("Candidatos agregados correctamente");
     }
@@ -38,7 +39,7 @@ public class CandidateController {
     @PatchMapping("/{id}")
     public ResponseEntity<Candidate> update(
             @PathVariable String id,
-            @RequestBody Candidate candidate) {
+            @RequestBody CandidateUpdateRequest candidate) {
 
         Candidate updated = candidateService.updateCandidate(id, candidate);
         return ResponseEntity.ok(updated);
@@ -57,7 +58,7 @@ public class CandidateController {
     @PatchMapping("/{id}/proposals")
     public ResponseEntity<Candidate> updateProposals(
             @PathVariable String id,
-            @RequestBody List<Proposal> proposals) {
+            @RequestBody GovernmentPlan proposals) {
 
         return ResponseEntity.ok(candidateService.updateProposals(id, proposals));
     }

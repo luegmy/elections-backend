@@ -1,9 +1,6 @@
 package com.gage.elections.controller.dto.request;
 
-import com.gage.elections.controller.dto.AchievementRequest;
-import com.gage.elections.controller.dto.ProposalRequest;
-import com.gage.elections.controller.dto.TransparencyRequest;
-import com.gage.elections.controller.dto.TrustRequest;
+import com.gage.elections.controller.dto.*;
 
 import java.util.List;
 
@@ -13,6 +10,7 @@ public record CandidateCreateRequest(
         String party,
         String partyAcronym,
         String biography,
+        List<LegalHistoryEntryRequest> history,
         List<ProposalRequest> proposals,
         List<AchievementRequest> achievements,
         TransparencyRequest transparency,

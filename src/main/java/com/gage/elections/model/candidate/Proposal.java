@@ -2,6 +2,7 @@ package com.gage.elections.model.candidate;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ public class Proposal {
     private String detailDescription;
     private String area;
     private String sourcePlan;
+    @Indexed
     private List<String> keywords;
 
     private double feasibilityScore; // 0.0 - 1.0: Puntaje de Viabilidad Técnica y Económica

@@ -6,6 +6,7 @@ import com.gage.elections.model.scoring.LegalStatus;
 import java.time.LocalDate;
 
 public record LegalHistoryEntryRequest(
+        String id,
         LocalDate date,
         String title,
         String description,

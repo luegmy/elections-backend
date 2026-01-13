@@ -12,7 +12,7 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "electoral.scoring.trust")
 public class TrustProperties {
     private double initialScore;
-    private TrustPenalties penalties;
+    private TrustPenalties penalties = new TrustPenalties();
 
     @Getter
     @Setter

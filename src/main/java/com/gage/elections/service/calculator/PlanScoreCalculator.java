@@ -11,7 +11,7 @@ import java.util.List;
 @Component
 public class PlanScoreCalculator {
 
-    private PlanProperties props;
+    private final PlanProperties props;
 
     public double calculate(List<Proposal> proposals) {
         if (proposals == null || proposals.isEmpty()) return 0.0;
