@@ -1,10 +1,12 @@
 package com.gage.elections.service;
 
-import com.gage.elections.controller.dto.request.CandidateCreateRequest;
 import com.gage.elections.controller.dto.MatchResponse;
+import com.gage.elections.controller.dto.request.CandidateCreateRequest;
+import com.gage.elections.controller.dto.request.CandidateUpdateRequest;
 import com.gage.elections.model.candidate.*;
 import com.gage.elections.repository.CandidateRepository;
 import com.gage.elections.repository.CandidateSearchRepository;
+import com.gage.elections.repository.GovernmentPlanRepository;
 import com.gage.elections.service.calculator.ScoringEngine;
 import com.gage.elections.service.mapper.CandidateMapper;
 import com.gage.elections.service.mapper.MatchMapper;
@@ -23,6 +25,7 @@ public class CandidateService {
 
     private final CandidateRepository candidateRepository;
     private final CandidateSearchRepository candidateSearchRepository;
+    private final GovernmentPlanRepository governmentPlanRepository;
     private final ScoringEngine scoringService;
     private final MatchMapper matchMapper;
     private final CandidateMapper candidateMapper;
@@ -33,55 +36,64 @@ public class CandidateService {
         candidateRepository.save(candidate);
     }
 
-    public void createCandidates(List<Candidate> candidates) {
+    public void createCandidates(List<CandidateCreateRequest> requests) {
+        List<Candidate> candidates = requests.stream()
+                .map(candidateMapper::toCandidate)
+                .toList();
         candidates.forEach(this::calculateScore);
         candidateRepository.saveAll(candidates);
     }
 
-    public Candidate updateCandidate(String code, Candidate request) {
-        return updateCandidateWithoutScore(code, candidate -> {
-
-            if (candidate.getName() == null) candidate.setName(request.getName());
-            if (candidate.getParty() == null) candidate.setParty(request.getParty());
-            if (candidate.getPosition() == null) candidate.setPosition(request.getPosition());
-            if (candidate.getBiography() != null) candidate.setBiography(request.getBiography());
-            if (candidate.getPartyAcronym() == null) candidate.setPartyAcronym(request.getPartyAcronym());
-
-        });
+    public Candidate updateCandidate(String code, CandidateUpdateRequest request) {
+        return updateCandidateWithoutScore(code, candidate -> candidateMapper.patch(request, candidate));
     }
 
     public Candidate updateHistory(String code, List<LegalHistoryEntry> history) {
         return updateCandidateWithScore(code, c -> {
-            c.getScores().setJudicialScore(scoringService.getJudicialCalculator(history));
             c.setHistory(history);
+            c.getScores().setJudicialScore(scoringService.getJudicialCalculator(history));
         });
     }
 
-    public Candidate updateProposals(String code, List<Proposal> proposals) {
+    public Candidate updateProposals(String code, GovernmentPlan request) {
         return updateCandidateWithScore(code, c -> {
-            c.getScores().setPlanScore(scoringService.getPlanCalculator(proposals));
-            c.setProposals(proposals);
+            GovernmentPlan plan = c.getGovernmentPlan();
+
+            if (plan == null) {
+                plan = new GovernmentPlan();
+                plan.setId(request.getId());
+                plan.setPartyCode(request.getPartyCode());
+            }
+
+            plan.setProposals(request.getProposals());
+            plan.setDocumentUrl(request.getDocumentUrl());
+
+            governmentPlanRepository.save(plan);
+
+            c.setGovernmentPlan(plan);
+
+            c.getScores().setPlanScore(scoringService.getPlanCalculator(request.getProposals()));
         });
     }
 
     public Candidate updateTrust(String code, Trust trust) {
         return updateCandidateWithScore(code, c -> {
-            c.getScores().setTrustScore(scoringService.getTrustCalculator(trust));
             c.setTrust(trust);
+            c.getScores().setTrustScore(scoringService.getTrustCalculator(trust));
         });
     }
 
     public Candidate updateAchievements(String code, List<Achievement> achievements) {
         return updateCandidateWithScore(code, c -> {
-            c.getScores().setContributionScore(scoringService.getContributionCalculator(achievements));
             c.setAchievements(achievements);
+            c.getScores().setContributionScore(scoringService.getContributionCalculator(achievements));
         });
     }
 
     public Candidate updateTransparency(String code, Transparency transparency) {
         return updateCandidateWithScore(code, c -> {
-            c.getScores().setTransparencyScore(scoringService.getTransparencyCalculator(transparency));
             c.setTransparency(transparency);
+            c.getScores().setTransparencyScore(scoringService.getTransparencyCalculator(transparency));
         });
     }
 
@@ -127,7 +139,7 @@ public class CandidateService {
         return candidateRepository.save(candidate);
     }
 
-    private Candidate updateCandidateWithoutScore(String code,Consumer<Candidate> updater) {
+    private Candidate updateCandidateWithoutScore(String code, Consumer<Candidate> updater) {
 
         Candidate candidate = getCandidateByCode(code);
 

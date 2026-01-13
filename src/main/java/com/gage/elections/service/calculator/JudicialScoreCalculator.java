@@ -21,10 +21,11 @@ public class JudicialScoreCalculator {
 
         double totalPenalty = history.stream()
                 .mapToDouble(h -> props.getPenaltyMap()
-                        .getOrDefault(new RuleKey(h.getStatus(), h.getSeverity()), 0.0))
+                        .getOrDefault(new RuleKey(h.getStatus(), h.getSeverity(), h.getCategory()), 0.0))
                 .sum();
 
         return Math.max(0, props.getBaseScore() - totalPenalty);
     }
+
 }
 

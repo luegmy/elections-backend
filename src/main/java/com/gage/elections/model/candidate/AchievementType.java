@@ -1,6 +1,5 @@
 package com.gage.elections.model.candidate;
 
-// Tipos de logros que registraremos
 public enum AchievementType {
     LAW_APPROVED,           // Ley aprobada (autor principal)
     LAW_PROPOSED,           // Ley propuesta (iniciativa)

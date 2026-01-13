@@ -1,5 +1,6 @@
 package com.gage.elections.service.calculator;
 
+import com.gage.elections.config.properties.ScoringWeightsProperties;
 import com.gage.elections.model.candidate.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ public class ScoringEngine {
     private final ContributionScoreCalculator contributionCalculator;
     private final TrustScoreCalculator trustCalculator;
     private final PlanScoreCalculator planCalculator;
+    private final ScoringWeightsProperties properties;
 
 
     public CompositeScore calculateAll(Candidate candidate) {
@@ -23,11 +25,16 @@ public class ScoringEngine {
                 ? candidate.getScores()
                 : new CompositeScore();
 
+        double planScore = 0.0;
+        if (candidate.getGovernmentPlan() != null) {
+            planScore = this.getPlanCalculator(candidate.getGovernmentPlan().getProposals());
+        }
+
         score.setJudicialScore(this.getJudicialCalculator(candidate.getHistory()));
         score.setTransparencyScore(this.getTransparencyCalculator(candidate.getTransparency()));
         score.setContributionScore( this.getContributionCalculator(candidate.getAchievements()));
         score.setTrustScore(this.getTrustCalculator(candidate.getTrust()));
-        score.setPlanScore(this.getPlanCalculator(candidate.getProposals()));
+        score.setPlanScore(planScore);
 
         recalculateFinalScore(candidate);
 
@@ -45,11 +52,11 @@ public class ScoringEngine {
         double p4Trust = s.getTrustScore();
         double p5Plan = s.getPlanScore();
 
-        double finalScore = (p1Judicial * 0.40) +
-                            (p5Plan * 0.20) +
-                            (p2Transparency * 0.15) +
-                            (p4Trust * 0.15) +
-                            (p3Contribution * 0.10);
+        double finalScore = (p1Judicial * properties.getJudicial()) +
+                            (p5Plan * properties.getPlan()) +
+                            (p2Transparency * properties.getTransparency()) +
+                            (p4Trust * properties.getTrust()) +
+                            (p3Contribution * properties.getContribution());
 
         // Penalizaciones estructurales
         if (p1Judicial < 50.0) finalScore *= 0.5;

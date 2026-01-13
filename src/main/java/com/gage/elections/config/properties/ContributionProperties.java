@@ -13,23 +13,47 @@ public class ContributionProperties {
     private double maxSubScore;
     private int maxItemsAllowed;
     private int maxYearsExperience;
-    private Map<String, Double> bonuses;
+
+    private BonusStructure bonuses;
     private Map<String, Double> penalties;
 
-    public double getAcademicBonus(int academicLevel) {
-        return switch (academicLevel) {
-            case 3 -> bonuses.getOrDefault("academic.doctorate", 25.0);
-            case 2 -> bonuses.getOrDefault("academic.mastery", 15.0);
-            case 1 -> bonuses.getOrDefault("academic.bachelor", 8.0);
+    @Getter @Setter
+    public static class BonusStructure {
+        private Academic academic;
+        private Relevance relevance;
+        private Double socialLeadership;
+    }
+
+    @Getter @Setter
+    public static class Academic {
+        private double doctorate;
+        private double mastery;
+        private double bachelor;
+    }
+
+    @Getter @Setter
+    public static class Relevance {
+        private double high;
+        private double medium;
+        private double low;
+    }
+
+    public double getAcademicBonus(int level) {
+        if (bonuses == null || bonuses.academic == null) return 0.0;
+        return switch (level) {
+            case 3 -> bonuses.academic.doctorate;
+            case 2 -> bonuses.academic.mastery;
+            case 1 -> bonuses.academic.bachelor;
             default -> 0.0;
         };
     }
 
-    public double getRelevanceScore(int impactLevel) {
-        return switch (impactLevel) {
-            case 3 -> bonuses.getOrDefault("relevance.high", 15.0);
-            case 2 -> bonuses.getOrDefault("relevance.medium", 7.0);
-            default -> bonuses.getOrDefault("relevance.low", 2.0);
+    public double getRelevanceScore(int impact) {
+        if (bonuses == null || bonuses.relevance == null) return 2.0;
+        return switch (impact) {
+            case 3 -> bonuses.relevance.high;
+            case 2 -> bonuses.relevance.medium;
+            default -> bonuses.relevance.low;
         };
     }
 }
