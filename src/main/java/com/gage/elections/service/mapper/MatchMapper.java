@@ -91,7 +91,7 @@ public abstract class MatchMapper {
     }
 
     private Optional<Proposal> findProposalMatch(Candidate candidate, String query) {
-        if (candidate.getGovernmentPlan().getProposals() == null) return Optional.empty();
+        if (candidate.getGovernmentPlan() == null || candidate.getGovernmentPlan().getProposals() == null) return Optional.empty();
 
         return candidate.getGovernmentPlan().getProposals().stream()
                 .filter(p ->
