@@ -58,20 +58,33 @@ public class CandidateService {
     public Candidate updateProposals(String code, GovernmentPlan request) {
         return updateCandidateWithScore(code, c -> {
             GovernmentPlan plan = c.getGovernmentPlan();
-
             if (plan == null) {
                 plan = new GovernmentPlan();
                 plan.setId(request.getId());
                 plan.setPartyCode(request.getPartyCode());
             }
-
             plan.setProposals(request.getProposals());
             plan.setDocumentUrl(request.getDocumentUrl());
 
             governmentPlanRepository.save(plan);
 
-            c.setGovernmentPlan(plan);
+            List<Candidate> partyMembers = candidateRepository.findAll().stream()
+                    .filter(m -> m.getParty().equals(c.getParty()))
+                    .toList();
 
+            for (Candidate member : partyMembers) {
+
+                member.setGovernmentPlan(plan);
+
+                member.getScores().setPlanScore(scoringService.getPlanCalculator(request.getProposals()));
+
+                if (!member.getCode().equals(c.getCode())) {
+                    recalculateScore(member);
+                    candidateRepository.save(member);
+                }
+            }
+
+            c.setGovernmentPlan(plan);
             c.getScores().setPlanScore(scoringService.getPlanCalculator(request.getProposals()));
         });
     }
