@@ -40,6 +40,12 @@ public class ContributionScoreCalculator {
                     }
                 }
 
+                case PUBLIC_SECTOR_EXPERIENCE -> {
+                    if (a.getRelevance() >= 3 && itemsCount++ < props.getMaxItemsAllowed()) {
+                        approvedPoints += props.getRelevanceScore(a.getRelevance());
+                    }
+                }
+
                 case LAW_PROPOSED -> proposedCount++;
 
                 case PROMISE_BROKEN -> {

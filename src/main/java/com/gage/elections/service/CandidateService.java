@@ -68,22 +68,6 @@ public class CandidateService {
 
             governmentPlanRepository.save(plan);
 
-            List<Candidate> partyMembers = candidateRepository.findAll().stream()
-                    .filter(m -> m.getParty().equals(c.getParty()))
-                    .toList();
-
-            for (Candidate member : partyMembers) {
-
-                member.setGovernmentPlan(plan);
-
-                member.getScores().setPlanScore(scoringService.getPlanCalculator(request.getProposals()));
-
-                if (!member.getCode().equals(c.getCode())) {
-                    recalculateScore(member);
-                    candidateRepository.save(member);
-                }
-            }
-
             c.setGovernmentPlan(plan);
             c.getScores().setPlanScore(scoringService.getPlanCalculator(request.getProposals()));
         });

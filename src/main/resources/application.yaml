@@ -190,21 +190,21 @@ electoral:
           bachelor: 8.0
         socialLeadership: 15.0
         relevance:
-          high: 15.0
-          medium: 7.0
-          low: 2.0
+          high: 25.0
+          medium: 10.0
+          low: 5.0
       penalties:
         promiseBroken: 20.0
 
     transparency:
-      declaration-base: 15.0
+      declaration-base: 30.0
       inconsistency-bonuses:
-        0: 10.0
-        1: 5.0
+        0: 20.0
+        1: 10.0
         2: 0.0
-      economic-info-item: 5.0
-      attendance-weight: 0.1
-      default-attendance-point: 8.0
+      economic-info-item: 10.0
+      attendance-weight: 0.2
+      default-attendance-point: 20.0
 
     trust:
       initial-score: 100.0

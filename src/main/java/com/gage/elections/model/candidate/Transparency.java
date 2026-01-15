@@ -3,12 +3,16 @@ package com.gage.elections.model.candidate;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class Transparency {
     // Fuente: Contraloría General de la República
     private boolean submittedDeclaration;
     private int declarationInconsistencies; // Reportadas por Contraloría
+    private List<String> inconsistencyDetails;
+    private String economicAuditNotes;
 
     // Fuente: Portal de Transparencia Estándar
     private boolean wasPublicOfficer;
