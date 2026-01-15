@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "electoral.scoring.weights")
+@ConfigurationProperties(prefix = "electoral.weights")
 @Component
 public class ScoringWeightsProperties {
     private double judicial;      // 0.40
