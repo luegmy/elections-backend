@@ -4,7 +4,9 @@ package com.gage.elections.controller;
 import com.gage.elections.controller.dto.request.CandidateCreateRequest;
 import com.gage.elections.controller.dto.MatchResponse;
 import com.gage.elections.controller.dto.request.CandidateUpdateRequest;
+import com.gage.elections.controller.dto.response.CandidateResponse;
 import com.gage.elections.model.candidate.*;
+import com.gage.elections.repository.projection.CandidateListView;
 import com.gage.elections.service.CandidateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -91,8 +93,8 @@ public class CandidateController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Candidate>> getAll() {
-        return ResponseEntity.ok(candidateService.findAll());
+    public ResponseEntity<List<CandidateResponse>> getAll(@RequestParam String query) {
+        return ResponseEntity.ok(candidateService.findAll(query));
     }
 
     @GetMapping("/{id}")

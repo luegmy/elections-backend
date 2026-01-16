@@ -91,7 +91,7 @@ public class ScoringEngine {
     }
 
     public double getContributionCalculator(List<Achievement> achievements) {
-        return Math.min((contributionCalculator.calculate(achievements)/50.0) * 100.00, 100.00);
+        return contributionCalculator.calculate(achievements);
     }
 
     private double round2(double value) {

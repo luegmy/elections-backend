@@ -61,7 +61,8 @@ public class PlanScoreCalculator {
             }
         }
 
-        return (totalPlanPoints / mandatoryAreas.size()) * 100.0;
+        double finalScore = (totalPlanPoints / mandatoryAreas.size()) * 100.0;
+        return round(finalScore);
     }
 
     private double calculateTechnicalFeasibility(Proposal p) {
@@ -90,5 +91,9 @@ public class PlanScoreCalculator {
         }
 
         return Math.min(baseFeasibility, 1.0); // No puede superar el 100%
+    }
+
+    private double round(double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 }
