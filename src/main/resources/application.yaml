@@ -21,163 +21,105 @@ electoral:
       penalties:
         # =========================================================
         # CATEGORÍA: PENAL (Corrupción, Robo, Homicidio, etc.)
-        # Impacto: Máximo. Dos sentencias firmes anulan el pilar.
+        # Máxima severidad: Escala 100% (Grave), 60% (Mod), 20% (Leve)
         # =========================================================
         - category: PENAL
           status: SENTENCIA_FIRME_CONDENATORIA
-          severity: GRAVE
-          value: 50.0
+          severity: [ GRAVE: 50.0, MODERADO: 30.0, LEVE: 10.0 ]
         - category: PENAL
           status: SENTENCIA_PRIMERA_INSTANCIA
-          severity: GRAVE
-          value: 35.0
+          severity: [ GRAVE: 35.0, MODERADO: 21.0, LEVE: 7.0 ]
         - category: PENAL
           status: PROCESO_JUDICIAL_ABIERTO
-          severity: GRAVE
-          value: 20.0
+          severity: [ GRAVE: 20.0, MODERADO: 12.0, LEVE: 4.0 ]
         - category: PENAL
           status: INVESTIGACION_PRELIMINAR
-          severity: GRAVE
-          value: 10.0
-
-        - category: PENAL
-          status: SENTENCIA_FIRME_CONDENATORIA
-          severity: MODERADO
-          value: 30.0
-        - category: PENAL
-          status: SENTENCIA_PRIMERA_INSTANCIA
-          severity: MODERADO
-          value: 21.0
-        - category: PENAL
-          status: PROCESO_JUDICIAL_ABIERTO
-          severity: MODERADO
-          value: 12.0
-        - category: PENAL
-          status: INVESTIGACION_PRELIMINAR
-          severity: MODERADO
-          value: 6.0
-
-        - category: PENAL
-          status: SENTENCIA_FIRME_CONDENATORIA
-          severity: LEVE
-          value: 10.0
-        - category: PENAL
-          status: SENTENCIA_PRIMERA_INSTANCIA
-          severity: LEVE
-          value: 7.0
-        - category: PENAL
-          status: PROCESO_JUDICIAL_ABIERTO
-          severity: LEVE
-          value: 4.0
-        - category: PENAL
-          status: INVESTIGACION_PRELIMINAR
-          severity: LEVE
-          value: 2.0
+          severity: [ GRAVE: 10.0, MODERADO: 6.0,  LEVE: 2.0 ]
 
         # =========================================================
-        # CATEGORÍA: FAMILIA (Alimentos, Violencia Familiar)
-        # Impacto: Muy Alto. Refleja la integridad moral básica.
+        # CATEGORÍA: FAMILIA (Alimentos, Violencia)
+        # Escala: Muy Alta. Prioriza responsabilidad ética.
         # =========================================================
         - category: FAMILIA
           status: SENTENCIA_FIRME_CONDENATORIA
-          severity: GRAVE
-          value: 40.0
+          severity: [ GRAVE: 40.0, MODERADO: 30.0, LEVE: 15.0 ]
         - category: FAMILIA
           status: SENTENCIA_PRIMERA_INSTANCIA
-          severity: GRAVE
-          value: 28.0
+          severity: [ GRAVE: 30.0, MODERADO: 20.0, LEVE: 10.0 ]
         - category: FAMILIA
           status: PROCESO_JUDICIAL_ABIERTO
-          severity: MODERADO
-          value: 10.0
+          severity: [ GRAVE: 20.0, MODERADO: 10.0, LEVE: 5.0 ]
         - category: FAMILIA
           status: INVESTIGACION_PRELIMINAR
-          severity: LEVE
-          value: 3.0
+          severity: [ GRAVE: 10.0, MODERADO: 5.0,  LEVE: 3.0 ]
 
         # =========================================================
-        # CATEGORÍA: TRIBUTARY (Deudas SUNAT, Evasión)
-        # Impacto: Medio-Alto. Responsabilidad con el tesoro público.
+        # CATEGORÍA: TRIBUTARY (Evasión, Deudas SUNAT)
+        # Escala: Alta. Responsabilidad con el Estado.
         # =========================================================
         - category: TRIBUTARY
           status: SENTENCIA_FIRME_CONDENATORIA
-          severity: MODERADO
-          value: 25.0
+          severity: [ GRAVE: 40.0, MODERADO: 30.0, LEVE: 15.0 ]
         - category: TRIBUTARY
           status: SENTENCIA_PRIMERA_INSTANCIA
-          severity: MODERADO
-          value: 18.0
+          severity: [ GRAVE: 25.0, MODERADO: 18.0, LEVE: 9.0 ]
         - category: TRIBUTARY
           status: PROCESO_JUDICIAL_ABIERTO
-          severity: LEVE
-          value: 7.0
+          severity: [ GRAVE: 20.0, MODERADO: 12.0, LEVE: 7.0 ]
         - category: TRIBUTARY
           status: INVESTIGACION_PRELIMINAR
-          severity: LEVE
-          value: 2.0
+          severity: [ GRAVE: 8.0,  MODERADO: 5.0,  LEVE: 2.0 ]
 
         # =========================================================
-        # CATEGORÍA: LABORAL (Beneficios sociales, despidos)
-        # Impacto: Medio. Respeto a los derechos de los trabajadores.
-        # =========================================================
-        - category: LABORAL
-          status: SENTENCIA_FIRME_CONDENATORIA
-          severity: MODERADO
-          value: 20.0
-        - category: LABORAL
-          status: SENTENCIA_PRIMERA_INSTANCIA
-          severity: MODERADO
-          value: 14.0
-        - category: LABORAL
-          status: PROCESO_JUDICIAL_ABIERTO
-          severity: LEVE
-          value: 5.0
-
-        # =========================================================
-        # CATEGORÍA: ADMINISTRATIVE (Sanciones del Estado, Multas)
-        # Impacto: Bajo-Medio. Cumplimiento de normas estatales.
+        # CATEGORÍA: ADMINISTRATIVE (Inhabilitaciones, Multas)
+        # Escala: Media. Gestión pública y normas.
         # =========================================================
         - category: ADMINISTRATIVE
           status: SENTENCIA_FIRME_CONDENATORIA
-          severity: LEVE
-          value: 15.0
+          severity: [ GRAVE: 35.0, MODERADO: 20.0, LEVE: 10.0 ]
         - category: ADMINISTRATIVE
           status: SENTENCIA_PRIMERA_INSTANCIA
-          severity: LEVE
-          value: 10.0
+          severity: [ GRAVE: 20.0, MODERADO: 15.0, LEVE: 7.0 ]
         - category: ADMINISTRATIVE
           status: PROCESO_JUDICIAL_ABIERTO
-          severity: LEVE
-          value: 4.0
+          severity: [ GRAVE: 12.0, MODERADO: 8.0,  LEVE: 4.0 ]
+        - category: ADMINISTRATIVE
+          status: INVESTIGACION_PRELIMINAR
+          severity: [ GRAVE: 6.0,  MODERADO: 4.0,  LEVE: 2.0 ]
 
         # =========================================================
-        # CATEGORÍA: CIVIL (Deudas bancarias, contratos, daños)
-        # Impacto: Bajo. Disputas entre particulares.
+        # CATEGORÍA: LABORAL (Beneficios, Despidos)
+        # Escala: Media-Baja. Derechos laborales.
+        # =========================================================
+        - category: LABORAL
+          status: SENTENCIA_FIRME_CONDENATORIA
+          severity: [ GRAVE: 30.0, MODERADO: 20.0, LEVE: 10.0 ]
+        - category: LABORAL
+          status: SENTENCIA_PRIMERA_INSTANCIA
+          severity: [ GRAVE: 20.0, MODERADO: 14.0, LEVE: 7.0 ]
+        - category: LABORAL
+          status: PROCESO_JUDICIAL_ABIERTO
+          severity: [ GRAVE: 10.0, MODERADO: 7.0,  LEVE: 5.0 ]
+        - category: LABORAL
+          status: INVESTIGACION_PRELIMINAR
+          severity: [ GRAVE: 5.0,  MODERADO: 3.0,  LEVE: 1.0 ]
+
+        # =========================================================
+        # CATEGORÍA: CIVIL (Deudas, Contratos)
+        # Escala: Baja. Conflictos entre privados.
         # =========================================================
         - category: CIVIL
           status: SENTENCIA_FIRME_CONDENATORIA
-          severity: LEVE
-          value: 10.0
+          severity: [ GRAVE: 20.0, MODERADO: 15.0, LEVE: 10.0 ]
         - category: CIVIL
           status: SENTENCIA_PRIMERA_INSTANCIA
-          severity: LEVE
-          value: 7.0
+          severity: [ GRAVE: 14.0, MODERADO: 10.0, LEVE: 7.0 ]
         - category: CIVIL
           status: PROCESO_JUDICIAL_ABIERTO
-          severity: LEVE
-          value: 2.0
-
-        # =========================================================
-        # CASOS NEUTRALES (No restan puntos)
-        # =========================================================
-        - category: PENAL
-          status: SENTENCIA_ABSOLUTORIA
-          severity: LEVE
-          value: 0.0
-        - category: PENAL
-          status: PRESCRITO
-          severity: LEVE
-          value: 0.0
+          severity: [ GRAVE: 8.0,  MODERADO: 5.0,  LEVE: 2.0 ]
+        - category: CIVIL
+          status: INVESTIGACION_PRELIMINAR
+          severity: [ GRAVE: 4.0,  MODERADO: 2.0,  LEVE: 1.0 ]
 
     contribution:
       max-sub-score: 50.0
@@ -194,17 +136,19 @@ electoral:
           medium: 10.0
           low: 5.0
       penalties:
-        promiseBroken: 20.0
+        promiseBroken: 15.0
+        fiscalDebtIncrease: 30.0
 
     transparency:
-      declaration-base: 30.0
+      declaration-base: 15.0
       inconsistency-bonuses:
         0: 20.0
-        1: 10.0
-        2: 0.0
+        1: 5.0
+        2: -10.0
+        3: -25.0
       economic-info-item: 10.0
-      attendance-weight: 0.2
-      default-attendance-point: 20.0
+      attendance-weight: 0.3
+      default-attendance-point: 5.0
 
     trust:
       initial-score: 100.0

@@ -7,6 +7,8 @@ public enum AchievementType {
     ACADEMIC_EXPERIENCE,    // Grados relevantes (Maestría, Doctorado)
     PUBLIC_SECTOR_EXPERIENCE, // Años de experiencia en gestión pública
     SOCIAL_PROJECT_LEADERSHIP, // Liderazgo de proyecto social/ONG
-    PROMISE_BROKEN
+    PROMISE_BROKEN,
+    FISCAL_DEBT_INCREASE,      // NUEVO: Para temas como los bonos de RLA (Negativo)
+    INFRASTRUCTURE_SUCCESS     // NUEVO: Obras exitosas (Positivo)
 }
 

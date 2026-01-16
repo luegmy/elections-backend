@@ -3,6 +3,7 @@ package com.gage.elections.service;
 import com.gage.elections.controller.dto.MatchResponse;
 import com.gage.elections.controller.dto.request.CandidateCreateRequest;
 import com.gage.elections.controller.dto.request.CandidateUpdateRequest;
+import com.gage.elections.controller.dto.response.CandidateResponse;
 import com.gage.elections.model.candidate.*;
 import com.gage.elections.repository.CandidateRepository;
 import com.gage.elections.repository.CandidateSearchRepository;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -94,11 +96,25 @@ public class CandidateService {
         });
     }
 
-    public List<Candidate> findAll() {
-        return candidateRepository.findAll();
-    }
 
-    public Candidate getCandidateByCode(String id) {
+    public List<CandidateResponse> findAll(String position) {
+
+            return candidateRepository.findByPosition(position)
+                    .stream()
+                    .map(v -> new CandidateResponse(
+                            v.getCode(),
+                            v.getName(),
+                            v.getParty(),
+                            v.getRankingLevel()
+                    ))
+                    .sorted(Comparator
+                            .comparingInt(CandidateResponse::rankingLevel)
+                    )
+                    .toList();
+        }
+
+
+        public Candidate getCandidateByCode(String id) {
         return candidateRepository.findByCode(id)
                 .orElseThrow(() -> new IllegalArgumentException("Candidate not found: " + id));
     }
