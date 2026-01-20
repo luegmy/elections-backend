@@ -1,6 +1,6 @@
 package com.gage.elections.service;
 
-import com.gage.elections.controller.dto.MatchResponse;
+import com.gage.elections.controller.dto.response.MatchResponse;
 import com.gage.elections.controller.dto.request.CandidateCreateRequest;
 import com.gage.elections.controller.dto.request.CandidateUpdateRequest;
 import com.gage.elections.controller.dto.response.CandidateResponse;
@@ -13,10 +13,11 @@ import com.gage.elections.service.mapper.CandidateMapper;
 import com.gage.elections.service.mapper.MatchMapper;
 import com.gage.elections.util.SearchUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -46,8 +47,16 @@ public class CandidateService {
         candidateRepository.saveAll(candidates);
     }
 
+    public Candidate updateCandidateAll(String code, CandidateCreateRequest request) {
+        Candidate existing = getCandidateByCode(code);
+        Candidate candidate = candidateMapper.toCandidate(request);
+        candidate.setCode(existing.getCode());
+        calculateScore(candidate);
+        return candidateRepository.save(candidate);
+    }
+
     public Candidate updateCandidate(String code, CandidateUpdateRequest request) {
-        return updateCandidateWithoutScore(code, candidate -> candidateMapper.patch(request, candidate));
+        return updateCandidateWithoutScore(code, candidate -> candidateMapper.patchToCandidate(request, candidate));
     }
 
     public Candidate updateHistory(String code, List<LegalHistoryEntry> history) {
@@ -67,9 +76,7 @@ public class CandidateService {
             }
             plan.setProposals(request.getProposals());
             plan.setDocumentUrl(request.getDocumentUrl());
-
             governmentPlanRepository.save(plan);
-
             c.setGovernmentPlan(plan);
             c.getScores().setPlanScore(scoringService.getPlanCalculator(request.getProposals()));
         });
@@ -96,31 +103,31 @@ public class CandidateService {
         });
     }
 
+    public Page<CandidateResponse> findAll(String position, Pageable pageable) {
+        Page<Candidate> page;
 
-    public List<CandidateResponse> findAll(String position) {
-
-            return candidateRepository.findByPosition(position)
-                    .stream()
-                    .map(v -> new CandidateResponse(
-                            v.getCode(),
-                            v.getName(),
-                            v.getParty(),
-                            v.getRankingLevel()
-                    ))
-                    .sorted(Comparator
-                            .comparingInt(CandidateResponse::rankingLevel)
-                    )
-                    .toList();
+        // Si el filtro es "all", traemos todo paginado. Si no, filtramos por posición.
+        if ("all".equalsIgnoreCase(position)) {
+            page = candidateRepository.findAll(pageable);
+        } else {
+            page = candidateRepository.findByPositionIgnoreCase(position, pageable);
         }
 
+        return page.map(v -> new CandidateResponse(
+                v.getCode(),
+                v.getName(),
+                v.getPhoto(),
+                v.getParty(),
+                v.getRankingLevel()
+        ));
+    }
 
-        public Candidate getCandidateByCode(String id) {
+    public Candidate getCandidateByCode(String id) {
         return candidateRepository.findByCode(id)
-                .orElseThrow(() -> new IllegalArgumentException("Candidate not found: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Candidato no encontrado: " + id));
     }
 
     public List<MatchResponse> searchCandidatesAtlas(String rawQuery) {
-
         String query = sanitizeAndValidate(rawQuery);
         if (query == null) return Collections.emptyList();
 
@@ -142,25 +149,18 @@ public class CandidateService {
     }
 
     private Candidate updateCandidateWithScore(String code, Consumer<Candidate> updater) {
-
         Candidate candidate = getCandidateByCode(code);
-
         updater.accept(candidate);
         recalculateScore(candidate);
         candidate.setRankingLevel(scoringService.determineRankingLevel(candidate.getScores().getFinalScore()));
-
         return candidateRepository.save(candidate);
     }
 
     private Candidate updateCandidateWithoutScore(String code, Consumer<Candidate> updater) {
-
         Candidate candidate = getCandidateByCode(code);
-
         updater.accept(candidate);
-
         return candidateRepository.save(candidate);
     }
-
 
     private String sanitizeAndValidate(String rawQuery) {
         String sanitized = SearchUtils.sanitize(rawQuery);

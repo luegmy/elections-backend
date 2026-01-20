@@ -7,7 +7,6 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +23,7 @@ public class Candidate {
     private String code;
     private String name;
     private String position;
+    private String photo;
     @Indexed
     private String party;
     private String partyAcronym;

@@ -1,4 +1,4 @@
-package com.gage.elections.controller.dto;
+package com.gage.elections.controller.dto.response;
 
 public record MatchResponse(
         String code,
