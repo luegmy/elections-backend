@@ -1,6 +1,6 @@
 package com.gage.elections.service.mapper;
 
-import com.gage.elections.controller.dto.MatchResponse;
+import com.gage.elections.controller.dto.response.MatchResponse;
 import com.gage.elections.model.candidate.Candidate;
 import com.gage.elections.model.candidate.LegalHistoryEntry;
 import com.gage.elections.model.candidate.Proposal;

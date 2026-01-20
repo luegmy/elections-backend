@@ -1,4 +1,4 @@
-package com.gage.elections.controller.dto;
+package com.gage.elections.controller.dto.request;
 
 import com.gage.elections.model.candidate.AchievementType;
 
