@@ -10,10 +10,10 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class SearchUtils {
 
-    private static final int MAX_QUERY_LENGTH = 50;
-    private static final int MIN_QUERY_LENGTH = 3;
+    static final int MAX_QUERY_LENGTH = 50;
+    static final int MIN_QUERY_LENGTH = 3;
 
-    private static final Pattern LUCENE_SPECIAL_CHARACTERS =
+    static final Pattern LUCENE_SPECIAL_CHARACTERS =
             Pattern.compile("[+\\-&|!(){}\\[\\]^\"~*?:/\\\\]");
 
     public static String sanitize(String input) {

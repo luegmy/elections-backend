@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TransparencyScoreCalculator {
 
-    private final TransparencyProperties props;
+    final TransparencyProperties props;
 
     public double calculate(Transparency transparency) {
         if (transparency == null) return 0.0;

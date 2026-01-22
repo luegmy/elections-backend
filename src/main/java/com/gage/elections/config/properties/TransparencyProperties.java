@@ -11,9 +11,9 @@ import java.util.Map;
 @Setter
 @ConfigurationProperties(prefix = "electoral.scoring.transparency")
 public class TransparencyProperties {
-    private double declarationBase;
-    private Map<Integer, Double> inconsistencyBonuses = new HashMap<>();
-    private double economicInfoItem;
-    private double attendanceWeight;
-    private double defaultAttendancePoint;
+    double declarationBase;
+    Map<Integer, Double> inconsistencyBonuses = new HashMap<>();
+    double economicInfoItem;
+    double attendanceWeight;
+    double defaultAttendancePoint;
 }

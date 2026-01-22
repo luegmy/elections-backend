@@ -12,7 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ContributionScoreCalculator {
 
-    private final ContributionProperties props;
+    final ContributionProperties props;
 
     public double calculate(List<Achievement> achievements) {
         if (achievements == null || achievements.isEmpty()) return 0.0;
@@ -24,7 +24,7 @@ public class ContributionScoreCalculator {
         return round(Math.min(totalManagement + totalHumanCapital, 100.0));
     }
 
-    private double calculateManagementScore(List<Achievement> achievements) {
+    double calculateManagementScore(List<Achievement> achievements) {
         double positivePoints = 0.0;
         double penaltyPoints = 0.0;
         int itemsCount = 0;
@@ -73,7 +73,7 @@ public class ContributionScoreCalculator {
         return Math.max(0.0, Math.min(positivePoints + initiativePoints - penaltyPoints, 50.0));
     }
 
-    private double calculateHumanCapitalScore(List<Achievement> achievements) {
+    double calculateHumanCapitalScore(List<Achievement> achievements) {
         double yearsOfExp = 0.0;
         int topAcademic = 0;
         boolean hasLeadershipBonus = false;
@@ -99,5 +99,5 @@ public class ContributionScoreCalculator {
         return Math.min(careerPath + academicPoints, 50.0);
     }
 
-    private double round(double value) { return Math.round(value * 100.0) / 100.0; }
+    double round(double value) { return Math.round(value * 100.0) / 100.0; }
 }

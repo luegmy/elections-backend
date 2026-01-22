@@ -11,17 +11,17 @@ import java.util.Map;
 @Setter
 @ConfigurationProperties(prefix = "electoral.scoring.trust")
 public class TrustProperties {
-    private double initialScore;
-    private TrustPenalties penalties = new TrustPenalties();
+    double initialScore;
+    TrustPenalties penalties = new TrustPenalties();
 
     @Getter
     @Setter
     public static class TrustPenalties {
-        private double majorScandal;
-        private double minorControversy;
-        private double factCheckMax;
-        private double factCheckUnit;
-        private double ethicsSanction;
-        private Map<Integer, Double> partySwitches = new HashMap<>();
+        double majorScandal;
+        double minorControversy;
+        double factCheckMax;
+        double factCheckUnit;
+        double ethicsSanction;
+        Map<Integer, Double> partySwitches = new HashMap<>();
     }
 }

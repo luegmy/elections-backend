@@ -11,8 +11,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Counter {
 
     @Id
-    private String id;
-    private long sequence;
+    String id;
+    long sequence;
 
 }
 

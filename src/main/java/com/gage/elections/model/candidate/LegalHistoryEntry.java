@@ -13,14 +13,14 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 public class LegalHistoryEntry {
-    private String id;
-    private LocalDate date;
-    private String title;
-    private String description;
-    private String expedientNumber;
-    private String source;   // URL o entidad que originó la denuncia
-    private boolean verified; // Si la información es comprobada
-    private LegalStatus status;
-    private IncidentSeverity severity;
-    private LegalCategory category;
+    String id;
+    LocalDate date;
+    String title;
+    String description;
+    String expedientNumber;
+    String source;   // URL o entidad que originó la denuncia
+    boolean verified; // Si la información es comprobada
+    LegalStatus status;
+    IncidentSeverity severity;
+    LegalCategory category;
 }

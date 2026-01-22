@@ -25,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CandidateController {
 
-    private final CandidateService candidateService;
+    final CandidateService candidateService;
 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody CandidateCreateRequest candidate) {

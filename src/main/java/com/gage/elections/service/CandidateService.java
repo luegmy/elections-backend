@@ -26,12 +26,12 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class CandidateService {
 
-    private final CandidateRepository candidateRepository;
-    private final CandidateSearchRepository candidateSearchRepository;
-    private final GovernmentPlanRepository governmentPlanRepository;
-    private final ScoringEngine scoringService;
-    private final MatchMapper matchMapper;
-    private final CandidateMapper candidateMapper;
+    final CandidateRepository candidateRepository;
+    final CandidateSearchRepository candidateSearchRepository;
+    final GovernmentPlanRepository governmentPlanRepository;
+    final ScoringEngine scoringService;
+    final MatchMapper matchMapper;
+    final CandidateMapper candidateMapper;
 
     public void createCandidate(CandidateCreateRequest request) {
         Candidate candidate = candidateMapper.toCandidate(request);
@@ -47,12 +47,27 @@ public class CandidateService {
         candidateRepository.saveAll(candidates);
     }
 
+//    public Candidate updateCandidateAll(String code, CandidateCreateRequest request) {
+//        Candidate existing = getCandidateByCode(code);
+//        Candidate candidate = candidateMapper.toCandidate(request);
+//        candidate.setCode(existing.getCode());
+//        calculateScore(candidate);
+//        return candidateRepository.save(candidate);
+//    }
+
     public Candidate updateCandidateAll(String code, CandidateCreateRequest request) {
+        // 1. Buscamos el original (el que tiene el ID de Mongo y los scores actuales)
         Candidate existing = getCandidateByCode(code);
-        Candidate candidate = candidateMapper.toCandidate(request);
-        candidate.setCode(existing.getCode());
-        calculateScore(candidate);
-        return candidateRepository.save(candidate);
+
+        // 2. IMPORTANTE: En lugar de toCandidate, usamos patchToCandidate
+        // Esto copia los datos del request SOBRE el objeto existente
+        candidateMapper.putToCandidate(request, existing);
+
+        // 3. Ahora 'existing' tiene los datos nuevos pero conserva su ID y consistencia
+        calculateScore(existing);
+
+        // 4. Guardamos el objeto original actualizado
+        return candidateRepository.save(existing);
     }
 
     public Candidate updateCandidate(String code, CandidateUpdateRequest request) {
@@ -138,17 +153,17 @@ public class CandidateService {
                 .toList();
     }
 
-    private void calculateScore(Candidate candidate) {
+    void calculateScore(Candidate candidate) {
         CompositeScore scores = scoringService.calculateAll(candidate);
         int level = scoringService.determineRankingLevel(scores.getFinalScore());
         candidate.updateScoring(scores, level);
     }
 
-    private void recalculateScore(Candidate candidate) {
+    void recalculateScore(Candidate candidate) {
         scoringService.recalculateFinalScore(candidate);
     }
 
-    private Candidate updateCandidateWithScore(String code, Consumer<Candidate> updater) {
+    Candidate updateCandidateWithScore(String code, Consumer<Candidate> updater) {
         Candidate candidate = getCandidateByCode(code);
         updater.accept(candidate);
         recalculateScore(candidate);
@@ -156,13 +171,13 @@ public class CandidateService {
         return candidateRepository.save(candidate);
     }
 
-    private Candidate updateCandidateWithoutScore(String code, Consumer<Candidate> updater) {
+    Candidate updateCandidateWithoutScore(String code, Consumer<Candidate> updater) {
         Candidate candidate = getCandidateByCode(code);
         updater.accept(candidate);
         return candidateRepository.save(candidate);
     }
 
-    private String sanitizeAndValidate(String rawQuery) {
+    String sanitizeAndValidate(String rawQuery) {
         String sanitized = SearchUtils.sanitize(rawQuery);
         return SearchUtils.isValid(sanitized) ? sanitized : null;
     }

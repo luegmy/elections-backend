@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 @RequiredArgsConstructor
 public class SpringMongoConfig {
 
-    private final MappingMongoConverter mappingMongoConverter;
+    final MappingMongoConverter mappingMongoConverter;
 
     @PostConstruct
     public void setUpMongoEscapeCharacterConversion() {

@@ -13,10 +13,10 @@ import java.util.List;
 @Document(collection = "government_plans")
 public class GovernmentPlan {
     @Id
-    private String id;
+    String id;
     @Indexed(unique = true)
-    private String partyCode;
-    private List<Proposal> proposals;
-    private String documentUrl; // Enlace al PDF oficial del JNE
+    String partyCode;
+    List<Proposal> proposals;
+    String documentUrl; // Enlace al PDF oficial del JNE
 }
 

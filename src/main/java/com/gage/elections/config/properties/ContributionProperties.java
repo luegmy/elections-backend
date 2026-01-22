@@ -10,32 +10,32 @@ import java.util.Map;
 @Setter
 @ConfigurationProperties(prefix = "electoral.scoring.contribution")
 public class ContributionProperties {
-    private double maxSubScore;
-    private int maxItemsAllowed;
-    private int maxYearsExperience;
+    double maxSubScore;
+    int maxItemsAllowed;
+    int maxYearsExperience;
 
-    private BonusStructure bonuses;
-    private Map<String, Double> penalties;
+    BonusStructure bonuses;
+    Map<String, Double> penalties;
 
     @Getter @Setter
     public static class BonusStructure {
-        private Academic academic;
-        private Relevance relevance;
-        private Double socialLeadership;
+        Academic academic;
+        Relevance relevance;
+        Double socialLeadership;
     }
 
     @Getter @Setter
     public static class Academic {
-        private double doctorate;
-        private double mastery;
-        private double bachelor;
+        double doctorate;
+        double mastery;
+        double bachelor;
     }
 
     @Getter @Setter
     public static class Relevance {
-        private double high;
-        private double medium;
-        private double low;
+        double high;
+        double medium;
+        double low;
     }
 
     public double getAcademicBonus(int level) {
