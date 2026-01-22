@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TrustScoreCalculator {
 
-    private final TrustProperties props;
+    final TrustProperties props;
 
     public double calculate(Trust trust) {
         if (trust == null) return props.getInitialScore();

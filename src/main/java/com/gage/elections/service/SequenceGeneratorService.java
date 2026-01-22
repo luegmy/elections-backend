@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SequenceGeneratorService {
 
-    private final MongoOperations mongoOperations;
+    final MongoOperations mongoOperations;
 
     public SequenceGeneratorService(MongoOperations mongoOperations) {
         this.mongoOperations = mongoOperations;

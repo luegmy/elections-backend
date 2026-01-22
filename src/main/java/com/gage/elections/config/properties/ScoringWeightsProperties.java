@@ -8,11 +8,10 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "electoral.weights")
-@Component
 public class ScoringWeightsProperties {
-    private double judicial;      // 0.40
-    private double plan;          // 0.20
-    private double transparency;  // 0.15
-    private double trust;         // 0.15
-    private double contribution;  // 0.10
+    private double judicial;
+    private double plan;
+    private double transparency;
+    private double trust;
+    private double contribution;
 }

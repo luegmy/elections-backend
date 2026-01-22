@@ -20,25 +20,25 @@ public class Candidate {
     public static final String SEQUENCE_NAME = "candidate_sequence";
 
     @Id
-    private String code;
-    private String name;
-    private String position;
-    private String photo;
+    String code;
+    String name;
+    String position;
+    String photo;
     @Indexed
-    private String party;
-    private String partyAcronym;
-    private String biography;
-    private List<LegalHistoryEntry> history;
-    private List<Achievement> achievements;
-    private Transparency transparency;
-    private Trust trust;
-    private CompositeScore scores;
-    private int rankingLevel;
+    String party;
+    String partyAcronym;
+    String biography;
+    List<LegalHistoryEntry> history;
+    List<Achievement> achievements;
+    Transparency transparency;
+    Trust trust;
+    CompositeScore scores;
+    int rankingLevel;
     @DocumentReference
-    private GovernmentPlan governmentPlan;
+    GovernmentPlan governmentPlan;
 
-    private LocalDateTime lastAuditDate;
-    private String dataSourceVersion;
+    LocalDateTime lastAuditDate;
+    String dataSourceVersion;
 
     public void updateScoring(CompositeScore scores, int rankingLevel) {
         this.scores = scores;

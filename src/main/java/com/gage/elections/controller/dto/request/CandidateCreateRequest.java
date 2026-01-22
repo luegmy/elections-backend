@@ -1,7 +1,5 @@
 package com.gage.elections.controller.dto.request;
 
-import com.gage.elections.model.candidate.GovernmentPlan;
-
 import java.util.List;
 
 public record CandidateCreateRequest(

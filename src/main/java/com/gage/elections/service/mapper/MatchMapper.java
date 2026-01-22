@@ -90,7 +90,7 @@ public abstract class MatchMapper {
         return Optional.empty();
     }
 
-    private Optional<Proposal> findProposalMatch(Candidate candidate, String query) {
+    Optional<Proposal> findProposalMatch(Candidate candidate, String query) {
         if (candidate.getGovernmentPlan() == null || candidate.getGovernmentPlan().getProposals() == null) return Optional.empty();
 
         return candidate.getGovernmentPlan().getProposals().stream()
@@ -103,7 +103,7 @@ public abstract class MatchMapper {
                 .findFirst();
     }
 
-    private Optional<LegalHistoryEntry> findLegalHistoryMatch(Candidate candidate, String query) {
+    Optional<LegalHistoryEntry> findLegalHistoryMatch(Candidate candidate, String query) {
         if (candidate.getHistory() == null) return Optional.empty();
 
         return candidate.getHistory().stream()
@@ -114,7 +114,7 @@ public abstract class MatchMapper {
                 .findFirst();
     }
 
-    private MatchResponse rebuild(
+    MatchResponse rebuild(
             MatchResponse base,
             String type,
             String matchTitle,

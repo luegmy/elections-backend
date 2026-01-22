@@ -11,12 +11,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScoringEngine {
 
-    private final JudicialScoreCalculator judicialCalculator;
-    private final TransparencyScoreCalculator transparencyCalculator;
-    private final ContributionScoreCalculator contributionCalculator;
-    private final TrustScoreCalculator trustCalculator;
-    private final PlanScoreCalculator planCalculator;
-    private final ScoringWeightsProperties properties;
+    final JudicialScoreCalculator judicialCalculator;
+    final TransparencyScoreCalculator transparencyCalculator;
+    final ContributionScoreCalculator contributionCalculator;
+    final TrustScoreCalculator trustCalculator;
+    final PlanScoreCalculator planCalculator;
+    final ScoringWeightsProperties properties;
 
 
     public CompositeScore calculateAll(Candidate candidate) {
@@ -94,7 +94,7 @@ public class ScoringEngine {
         return contributionCalculator.calculate(achievements);
     }
 
-    private double round2(double value) {
+    double round2(double value) {
         return Math.round(value * 100.0) / 100.0;
     }
 }

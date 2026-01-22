@@ -12,7 +12,7 @@ import java.util.List;
 @Component
 public class JudicialScoreCalculator {
 
-    private final JudicialProperties props;
+    final JudicialProperties props;
 
     public double calculate(List<LegalHistoryEntry> history) {
         if (history == null || history.isEmpty()) {

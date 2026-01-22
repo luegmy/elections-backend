@@ -14,9 +14,9 @@ import java.util.regex.Pattern;
 @Component
 public class PlanScoreCalculator {
 
-    private final PlanProperties props;
+    final PlanProperties props;
     // Regex para detectar metas (%, números, hectáreas, km) y referencias a leyes/derogaciones
-    private static final Pattern TECHNICAL_PATTERN = Pattern.compile(".*(\\d+%|\\d+ (hectáreas|km|unidades)|derog|ley|artículo|normativa|NDC).*");
+    static final Pattern TECHNICAL_PATTERN = Pattern.compile(".*(\\d+%|\\d+ (hectáreas|km|unidades)|derog|ley|artículo|normativa|NDC).*");
 
     public double calculate(List<Proposal> proposals) {
         if (proposals == null || proposals.isEmpty()) return 0.0;
@@ -65,7 +65,7 @@ public class PlanScoreCalculator {
         return round(finalScore);
     }
 
-    private double calculateTechnicalFeasibility(Proposal p) {
+    double calculateTechnicalFeasibility(Proposal p) {
         double baseFeasibility = p.getFeasibilityScore();
         String detail = (p.getDetailDescription() != null) ? p.getDetailDescription().trim() : "";
 
@@ -93,7 +93,7 @@ public class PlanScoreCalculator {
         return Math.min(baseFeasibility, 1.0); // No puede superar el 100%
     }
 
-    private double round(double value) {
+    double round(double value) {
         return Math.round(value * 100.0) / 100.0;
     }
 }

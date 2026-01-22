@@ -20,9 +20,9 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "electoral.scoring.judicial")
 public class JudicialProperties {
 
-    private double baseScore;
-    private List<PenaltyRuleItem> penalties = new ArrayList<>();
-    private Map<RuleKey, Double> penaltyMap = new HashMap<>();
+    double baseScore;
+    List<PenaltyRuleItem> penalties = new ArrayList<>();
+    Map<RuleKey, Double> penaltyMap = new HashMap<>();
 
     @PostConstruct
     public void init() {
@@ -38,9 +38,9 @@ public class JudicialProperties {
     @Getter
     @Setter
     public static class PenaltyRuleItem {
-        private LegalStatus status;
-        private IncidentSeverity severity;
-        private LegalCategory category;
-        private double value;
+        LegalStatus status;
+        IncidentSeverity severity;
+        LegalCategory category;
+        double value;
     }
 }

@@ -11,7 +11,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
         TransparencyProperties.class,
         TrustProperties.class,
         ContributionProperties.class,
-        PlanProperties.class
+        PlanProperties.class,
+        ScoringWeightsProperties.class
 })
 @SpringBootApplication
 public class ElectionsApplication {

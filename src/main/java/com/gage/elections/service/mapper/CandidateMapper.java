@@ -19,6 +19,9 @@ public interface CandidateMapper {
     Candidate toCandidate (CandidateCreateRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = IGNORE)
+    void putToCandidate(CandidateCreateRequest request, @MappingTarget Candidate candidate);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = IGNORE)
     void patchToCandidate(CandidateUpdateRequest request, @MappingTarget Candidate candidate);
 
     LegalHistoryEntry toLegalHistory(LegalHistoryEntryRequest request);

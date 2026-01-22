@@ -10,11 +10,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CompositeScore {
-    private double judicialScore;
-    private double contributionScore;
-    private double transparencyScore;
-    private double trustScore;
-    private double planScore;
-    private double finalScore;
+    double judicialScore;
+    double contributionScore;
+    double transparencyScore;
+    double trustScore;
+    double planScore;
+    double finalScore;
 }
 

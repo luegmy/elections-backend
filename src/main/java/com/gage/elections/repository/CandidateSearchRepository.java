@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public class CandidateSearchRepository {
 
-    private final MongoTemplate mongoTemplate;
+    final MongoTemplate mongoTemplate;
 
     public List<Candidate> searchByAtlas(String query) {
         // La clave es el orden: 1. Search, 2. Add Score Field, 3. Sort por Score
@@ -34,7 +34,7 @@ public class CandidateSearchRepository {
         ).getMappedResults();
     }
 
-    private AggregationOperation buildAtlasSearchStage(String query) {
+    AggregationOperation buildAtlasSearchStage(String query) {
         return context -> new Document("$search",
                 new Document("index", "default")
                         .append("compound", new Document("should", List.of(
@@ -46,16 +46,16 @@ public class CandidateSearchRepository {
         );
     }
 
-    private Document searchInPlanKeywords(String query) {
+    Document searchInPlanKeywords(String query) {
         return createTextSearch(query, List.of("proposals.keywords"), 3.0, 1);
     }
 
     // Separamos el nombre para darle un impulso (Boost) mucho más alto
-    private Document searchInNameOnly(String query) {
+    Document searchInNameOnly(String query) {
         return createTextSearch(query, List.of("name"), 10.0, 1);
     }
 
-    private Document searchInProfileGeneral(String query) {
+    Document searchInProfileGeneral(String query) {
         return createTextSearch(
                 query,
                 List.of(
@@ -72,7 +72,7 @@ public class CandidateSearchRepository {
         );
     }
 
-    private Document createTextSearch(String query, List<String> paths, double boost, int maxEdits) {
+    Document createTextSearch(String query, List<String> paths, double boost, int maxEdits) {
         Document text = new Document()
                 .append("query", query)
                 .append("path", paths.size() == 1 ? paths.get(0) : paths)
