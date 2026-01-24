@@ -25,16 +25,18 @@ public class ScoringEngine {
                 ? candidate.getScores()
                 : new CompositeScore();
 
-        double planScore = 0.0;
-        if (candidate.getGovernmentPlan() != null) {
-            planScore = this.getPlanCalculator(candidate.getGovernmentPlan().getProposals());
-        }
-
         score.setJudicialScore(this.getJudicialCalculator(candidate.getHistory()));
         score.setTransparencyScore(this.getTransparencyCalculator(candidate.getTransparency()));
         score.setContributionScore( this.getContributionCalculator(candidate.getAchievements()));
         score.setTrustScore(this.getTrustCalculator(candidate.getTrust()));
+
+        double planScore = 0.0;
+        if (candidate.getGovernmentPlan() != null) {
+            planScore = this.getPlanCalculator(candidate.getGovernmentPlan().getProposals());
+        }
         score.setPlanScore(planScore);
+
+        candidate.setScores(score);
 
         recalculateFinalScore(candidate);
 
