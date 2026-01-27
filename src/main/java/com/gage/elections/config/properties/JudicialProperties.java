@@ -20,27 +20,33 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "electoral.scoring.judicial")
 public class JudicialProperties {
 
-    double baseScore;
-    List<PenaltyRuleItem> penalties = new ArrayList<>();
-    Map<RuleKey, Double> penaltyMap = new HashMap<>();
+    private double baseScore;
+    private List<PenaltyRuleItem> penalties = new ArrayList<>();
+    private Map<RuleKey, Double> penaltyMap = new HashMap<>();
 
     @PostConstruct
     public void init() {
         if (penalties == null) return;
+        penaltyMap.clear();
+
         for (PenaltyRuleItem item : penalties) {
-            penaltyMap.put(
-                    new RuleKey(item.getStatus(), item.getSeverity(), item.getCategory()),
-                    item.getValue()
-            );
+            // Si el YAML tiene el mapa de severidades (GRAVE, MODERADO...)
+            if (item.getSeverity() != null) {
+                item.getSeverity().forEach((sev, val) -> {
+                    // Creamos la llave EXACTA que el calculador buscará
+                    RuleKey key = new RuleKey(item.getStatus(), sev, item.getCategory());
+                    penaltyMap.put(key, val);
+                    System.out.println("DEBUG: Regla cargada -> " + key + " = " + val);
+                });
+            }
         }
     }
 
     @Getter
     @Setter
     public static class PenaltyRuleItem {
-        LegalStatus status;
-        IncidentSeverity severity;
-        LegalCategory category;
-        double value;
+        private LegalStatus status;
+        private LegalCategory category;
+        private Map<IncidentSeverity, Double> severity;
     }
 }

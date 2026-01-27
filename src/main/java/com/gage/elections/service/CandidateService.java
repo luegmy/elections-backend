@@ -35,6 +35,11 @@ public class CandidateService {
 
     public void createCandidate(CandidateCreateRequest request) {
         Candidate candidate = candidateMapper.toCandidate(request);
+
+        if (candidate.getGovernmentPlan() != null) {
+            governmentPlanRepository.save(candidate.getGovernmentPlan());
+        }
+
         calculateScore(candidate);
         candidateRepository.save(candidate);
     }
@@ -46,14 +51,6 @@ public class CandidateService {
         candidates.forEach(this::calculateScore);
         candidateRepository.saveAll(candidates);
     }
-
-//    public Candidate updateCandidateAll(String code, CandidateCreateRequest request) {
-//        Candidate existing = getCandidateByCode(code);
-//        Candidate candidate = candidateMapper.toCandidate(request);
-//        candidate.setCode(existing.getCode());
-//        calculateScore(candidate);
-//        return candidateRepository.save(candidate);
-//    }
 
     public Candidate updateCandidateAll(String code, CandidateCreateRequest request) {
         // 1. Buscamos el original (el que tiene el ID de Mongo y los scores actuales)

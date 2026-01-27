@@ -60,7 +60,7 @@ public class ScoringEngine {
                             (p4Trust * properties.getTrust()) +
                             (p3Contribution * properties.getContribution());
 
-        if (p1Judicial < 50.0) finalScore *= 0.5;
+        if (p1Judicial < 40.0) finalScore *= 0.5;
 
         if (p5Plan > 0.0 && p5Plan < 40.0) {
             finalScore -= 10.0;
