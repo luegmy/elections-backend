@@ -12,114 +12,186 @@ electoral:
   weights:
     judicial: 0.40
     plan: 0.20
-    transparency: 0.15
-    trust: 0.15
+    transparency: 0.20
+    trust: 0.10
     contribution: 0.10
   scoring:
     judicial:
       base-score: 100.0
       penalties:
         # =========================================================
-        # CATEGORÍA: PENAL (Corrupción, Robo, Homicidio, etc.)
-        # Máxima severidad: Escala 100% (Grave), 60% (Mod), 20% (Leve)
+        # CATEGORÍA: PENAL
         # =========================================================
         - category: PENAL
           status: SENTENCIA_FIRME_CONDENATORIA
-          severity: [ GRAVE: 50.0, MODERADO: 30.0, LEVE: 10.0 ]
+          severity:
+            GRAVE: 50.0
+            MODERADO: 30.0
+            LEVE: 10.0
         - category: PENAL
           status: SENTENCIA_PRIMERA_INSTANCIA
-          severity: [ GRAVE: 35.0, MODERADO: 21.0, LEVE: 7.0 ]
+          severity:
+            GRAVE: 35.0
+            MODERADO: 21.0
+            LEVE: 7.0
         - category: PENAL
           status: PROCESO_JUDICIAL_ABIERTO
-          severity: [ GRAVE: 20.0, MODERADO: 12.0, LEVE: 4.0 ]
+          severity:
+            GRAVE: 20.0
+            MODERADO: 12.0
+            LEVE: 4.0
         - category: PENAL
           status: INVESTIGACION_PRELIMINAR
-          severity: [ GRAVE: 10.0, MODERADO: 6.0,  LEVE: 2.0 ]
+          severity:
+            GRAVE: 10.0
+            MODERADO: 6.0
+            LEVE: 2.0
+        - status: SENTENCIA_ABSOLUTORIA
+          category: PENAL
+          severity:
+            LEVE: 0
+            MODERADO: 0
+            GRAVE: 0
 
         # =========================================================
-        # CATEGORÍA: FAMILIA (Alimentos, Violencia)
-        # Escala: Muy Alta. Prioriza responsabilidad ética.
+        # CATEGORÍA: FAMILIA
         # =========================================================
         - category: FAMILIA
           status: SENTENCIA_FIRME_CONDENATORIA
-          severity: [ GRAVE: 40.0, MODERADO: 30.0, LEVE: 15.0 ]
+          severity:
+            GRAVE: 40.0
+            MODERADO: 30.0
+            LEVE: 15.0
         - category: FAMILIA
           status: SENTENCIA_PRIMERA_INSTANCIA
-          severity: [ GRAVE: 30.0, MODERADO: 20.0, LEVE: 10.0 ]
+          severity:
+            GRAVE: 30.0
+            MODERADO: 20.0
+            LEVE: 10.0
         - category: FAMILIA
           status: PROCESO_JUDICIAL_ABIERTO
-          severity: [ GRAVE: 20.0, MODERADO: 10.0, LEVE: 5.0 ]
+          severity:
+            GRAVE: 20.0
+            MODERADO: 10.0
+            LEVE: 5.0
         - category: FAMILIA
           status: INVESTIGACION_PRELIMINAR
-          severity: [ GRAVE: 10.0, MODERADO: 5.0,  LEVE: 3.0 ]
+          severity:
+            GRAVE: 10.0
+            MODERADO: 5.0
+            LEVE: 3.0
 
         # =========================================================
-        # CATEGORÍA: TRIBUTARY (Evasión, Deudas SUNAT)
-        # Escala: Alta. Responsabilidad con el Estado.
+        # CATEGORÍA: TRIBUTARY
         # =========================================================
         - category: TRIBUTARY
           status: SENTENCIA_FIRME_CONDENATORIA
-          severity: [ GRAVE: 40.0, MODERADO: 30.0, LEVE: 15.0 ]
+          severity:
+            GRAVE: 40.0
+            MODERADO: 30.0
+            LEVE: 15.0
         - category: TRIBUTARY
           status: SENTENCIA_PRIMERA_INSTANCIA
-          severity: [ GRAVE: 25.0, MODERADO: 18.0, LEVE: 9.0 ]
+          severity:
+            GRAVE: 25.0
+            MODERADO: 18.0
+            LEVE: 9.0
         - category: TRIBUTARY
           status: PROCESO_JUDICIAL_ABIERTO
-          severity: [ GRAVE: 20.0, MODERADO: 12.0, LEVE: 7.0 ]
+          severity:
+            GRAVE: 20.0
+            MODERADO: 12.0
+            LEVE: 7.0
         - category: TRIBUTARY
           status: INVESTIGACION_PRELIMINAR
-          severity: [ GRAVE: 8.0,  MODERADO: 5.0,  LEVE: 2.0 ]
+          severity:
+            GRAVE: 8.0
+            MODERADO: 5.0
+            LEVE: 2.0
 
         # =========================================================
-        # CATEGORÍA: ADMINISTRATIVE (Inhabilitaciones, Multas)
-        # Escala: Media. Gestión pública y normas.
+        # CATEGORÍA: ADMINISTRATIVE
         # =========================================================
         - category: ADMINISTRATIVE
           status: SENTENCIA_FIRME_CONDENATORIA
-          severity: [ GRAVE: 35.0, MODERADO: 20.0, LEVE: 10.0 ]
+          severity:
+            GRAVE: 35.0
+            MODERADO: 20.0
+            LEVE: 10.0
         - category: ADMINISTRATIVE
           status: SENTENCIA_PRIMERA_INSTANCIA
-          severity: [ GRAVE: 20.0, MODERADO: 15.0, LEVE: 7.0 ]
+          severity:
+            GRAVE: 20.0
+            MODERADO: 15.0
+            LEVE: 7.0
         - category: ADMINISTRATIVE
           status: PROCESO_JUDICIAL_ABIERTO
-          severity: [ GRAVE: 12.0, MODERADO: 8.0,  LEVE: 4.0 ]
+          severity:
+            GRAVE: 12.0
+            MODERADO: 8.0
+            LEVE: 4.0
         - category: ADMINISTRATIVE
           status: INVESTIGACION_PRELIMINAR
-          severity: [ GRAVE: 6.0,  MODERADO: 4.0,  LEVE: 2.0 ]
+          severity:
+            GRAVE: 6.0
+            MODERADO: 4.0
+            LEVE: 2.0
 
         # =========================================================
-        # CATEGORÍA: LABORAL (Beneficios, Despidos)
-        # Escala: Media-Baja. Derechos laborales.
+        # CATEGORÍA: LABORAL
         # =========================================================
         - category: LABORAL
           status: SENTENCIA_FIRME_CONDENATORIA
-          severity: [ GRAVE: 30.0, MODERADO: 20.0, LEVE: 10.0 ]
+          severity:
+            GRAVE: 30.0
+            MODERADO: 20.0
+            LEVE: 10.0
         - category: LABORAL
           status: SENTENCIA_PRIMERA_INSTANCIA
-          severity: [ GRAVE: 20.0, MODERADO: 14.0, LEVE: 7.0 ]
+          severity:
+            GRAVE: 20.0
+            MODERADO: 14.0
+            LEVE: 7.0
         - category: LABORAL
           status: PROCESO_JUDICIAL_ABIERTO
-          severity: [ GRAVE: 10.0, MODERADO: 7.0,  LEVE: 5.0 ]
+          severity:
+            GRAVE: 10.0
+            MODERADO: 7.0
+            LEVE: 5.0
         - category: LABORAL
           status: INVESTIGACION_PRELIMINAR
-          severity: [ GRAVE: 5.0,  MODERADO: 3.0,  LEVE: 1.0 ]
+          severity:
+            GRAVE: 5.0
+            MODERADO: 3.0
+            LEVE: 1.0
 
         # =========================================================
-        # CATEGORÍA: CIVIL (Deudas, Contratos)
-        # Escala: Baja. Conflictos entre privados.
+        # CATEGORÍA: CIVIL
         # =========================================================
         - category: CIVIL
           status: SENTENCIA_FIRME_CONDENATORIA
-          severity: [ GRAVE: 20.0, MODERADO: 15.0, LEVE: 10.0 ]
+          severity:
+            GRAVE: 20.0
+            MODERADO: 15.0
+            LEVE: 10.0
         - category: CIVIL
           status: SENTENCIA_PRIMERA_INSTANCIA
-          severity: [ GRAVE: 14.0, MODERADO: 10.0, LEVE: 7.0 ]
+          severity:
+            GRAVE: 14.0
+            MODERADO: 10.0
+            LEVE: 7.0
         - category: CIVIL
           status: PROCESO_JUDICIAL_ABIERTO
-          severity: [ GRAVE: 8.0,  MODERADO: 5.0,  LEVE: 2.0 ]
+          severity:
+            GRAVE: 8.0
+            MODERADO: 5.0
+            LEVE: 2.0
         - category: CIVIL
           status: INVESTIGACION_PRELIMINAR
-          severity: [ GRAVE: 4.0,  MODERADO: 2.0,  LEVE: 1.0 ]
+          severity:
+            GRAVE: 4.0
+            MODERADO: 2.0
+            LEVE: 1.0
 
     contribution:
       max-sub-score: 50.0
@@ -172,10 +244,4 @@ electoral:
 logging:
   level:
     root: INFO
-    # Permite ver las consultas de agregación y comandos enviados
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG
-    # Permite ver la comunicación a nivel de driver (opcional, genera mucho texto)
-    org.mongodb.driver.protocol.command: DEBUG
-    # Para ver exactamente qué está mapeando Spring
-    org.springframework.data.mongodb.core.convert.MappingMongoConverter: INFO
-
