@@ -6,7 +6,10 @@ import com.gage.elections.controller.dto.response.MatchResponse;
 import com.gage.elections.controller.dto.response.CandidateResponse;
 import com.gage.elections.model.candidate.*;
 import com.gage.elections.service.CandidateService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,6 +29,21 @@ import java.util.List;
 public class CandidateController {
 
     final CandidateService candidateService;
+
+    private static final Logger logger = LoggerFactory.getLogger(CandidateController.class);
+
+    @GetMapping("/registrar-voto")
+    public String registrarVoto(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        String remoteIp = (xForwardedFor != null && !xForwardedFor.isEmpty())
+                ? xForwardedFor.split(",")[0].trim()
+                : request.getRemoteAddr();
+
+        // Esto DEBE aparecer en el panel de Logs de Render
+        logger.info("NUEVA PETICIÓN - IP detectada: {}", remoteIp);
+
+        return "IP registrada: " + remoteIp;
+    }
 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody CandidateCreateRequest candidate) {
