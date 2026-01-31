@@ -36,7 +36,6 @@ public class JudicialProperties {
                     // Creamos la llave EXACTA que el calculador buscará
                     RuleKey key = new RuleKey(item.getStatus(), sev, item.getCategory());
                     penaltyMap.put(key, val);
-                    System.out.println("DEBUG: Regla cargada -> " + key + " = " + val);
                 });
             }
         }

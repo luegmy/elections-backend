@@ -20,7 +20,6 @@ public class ContributionScoreCalculator {
         double totalManagement = calculateManagementScore(achievements);
         double totalHumanCapital = calculateHumanCapitalScore(achievements);
 
-        // Suma de los dos pilares (Max 50 cada uno)
         return round(Math.min(totalManagement + totalHumanCapital, 100.0));
     }
 
@@ -28,75 +27,57 @@ public class ContributionScoreCalculator {
         double positivePoints = 0.0;
         double penaltyPoints = 0.0;
         int itemsCount = 0;
-        int proposedLawsCount = 0;
-
-        // Identificamos perfil
-        boolean isPublicOfficial = achievements.stream()
-                .anyMatch(a -> a.getType() == AchievementType.PUBLIC_SECTOR_EXPERIENCE);
 
         for (Achievement a : achievements) {
             if (a.getType() == null) continue;
 
+            double relevance = props.getRelevanceScore(a.getRelevance());
+            double impact = Math.max(0, a.getImpactScore());
+
             switch (a.getType()) {
-                // 1. LOGROS CONCRETOS (Obras o Leyes aprobadas)
-                case LAW_APPROVED, PUBLIC_PROJECT_COMPLETED, INFRASTRUCTURE_SUCCESS -> {
+                // NIVELACIÓN: Sumamos impacto ya sea en Sector Público o Social (Rectoría, ONGs, etc.)
+                case PUBLIC_PROJECT_COMPLETED, SOCIAL_PROJECT_LEADERSHIP,
+                     INFRASTRUCTURE_SUCCESS, LAW_APPROVED -> {
                     if (itemsCount++ < props.getMaxItemsAllowed()) {
-                        double base = props.getRelevanceScore(a.getRelevance());
-                        double multiplier = isPublicOfficial ? 1.0 : 0.5;
-                        positivePoints += (base * Math.max(0, a.getImpactScore()) * multiplier);
+                        // Eliminamos el multiplicador excluyente. El impacto es impacto.
+                        positivePoints += (relevance * impact);
                     }
                 }
 
-                // 2. LA PIEZA FALTANTE: LEYES PROPUESTAS
-                case LAW_PROPOSED -> proposedLawsCount++;
+                case LAW_PROPOSED -> positivePoints += 1.0; // Puntos por iniciativa legislativa
 
-                // 3. NIVELACIÓN PARA PRIVADOS (Rectores/Dirigentes)
-                case SOCIAL_PROJECT_LEADERSHIP -> {
-                    if (!isPublicOfficial && itemsCount++ < props.getMaxItemsAllowed()) {
-                        positivePoints += props.getRelevanceScore(a.getRelevance()) * Math.max(0, a.getImpactScore());
-                    }
-                }
-
-                // 4. PENALIDADES (Restan de la gestión)
                 case PROMISE_BROKEN, FISCAL_DEBT_INCREASE -> {
-                    String key = (a.getType() == AchievementType.FISCAL_DEBT_INCREASE) ? "fiscalDebtIncrease" : "promiseBroken";
-                    double penaltyBase = props.getPenalties().getOrDefault(key, 15.0);
+                    double penaltyBase = props.getPenalties().getOrDefault(a.getType().name(), 15.0);
                     penaltyPoints += penaltyBase * Math.abs(a.getImpactScore());
                 }
                 default -> {}
             }
         }
-
-        // Sumamos las leyes propuestas con un tope (ejemplo: 1 pto cada una, máximo 5 pts)
-        double initiativePoints = Math.min(proposedLawsCount, 5.0);
-
-        return Math.max(0.0, Math.min(positivePoints + initiativePoints - penaltyPoints, 50.0));
+        return Math.max(0.0, Math.min(positivePoints - penaltyPoints, 50.0));
     }
 
     double calculateHumanCapitalScore(List<Achievement> achievements) {
         double yearsOfExp = 0.0;
-        int topAcademic = 0;
-        boolean hasLeadershipBonus = false;
+        int topAcademicLevel = 0;
 
         for (Achievement a : achievements) {
             switch (a.getType()) {
-                case ACADEMIC_EXPERIENCE -> topAcademic = Math.max(topAcademic, a.getRelevance());
-                case PUBLIC_SECTOR_EXPERIENCE -> yearsOfExp += a.getQuantity();
-                case SOCIAL_PROJECT_LEADERSHIP -> {
-                    if (a.getRelevance() >= 2) hasLeadershipBonus = true;
-                }
+                case ACADEMIC_EXPERIENCE ->
+                        topAcademicLevel = Math.max(topAcademicLevel, a.getRelevance());
+
+                // Aquí sumamos TODA la experiencia, pública o privada (como Rector)
+                case PUBLIC_SECTOR_EXPERIENCE ->
+                        yearsOfExp += a.getQuantity();
+
                 default -> {}
             }
         }
 
         double expPoints = Math.min(yearsOfExp, props.getMaxYearsExperience());
-        double leaderBonus = hasLeadershipBonus ? props.getBonuses().getSocialLeadership() : 0.0;
+        double academicBonus = props.getAcademicBonus(topAcademicLevel);
 
-        // Trayectoria (Max 25) + Académico (Max 25) = 50
-        double careerPath = Math.min(expPoints + leaderBonus, 25.0);
-        double academicPoints = props.getAcademicBonus(topAcademic);
-
-        return Math.min(careerPath + academicPoints, 50.0);
+        // Max 25 por "Kilometraje" + Max 25 por "Grado Académico" = 50
+        return Math.min(expPoints + academicBonus, 50.0);
     }
 
     double round(double value) { return Math.round(value * 100.0) / 100.0; }
