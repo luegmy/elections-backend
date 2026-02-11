@@ -3,6 +3,7 @@ package com.gage.elections.service.calculator;
 import com.gage.elections.config.properties.ContributionProperties;
 import com.gage.elections.model.candidate.Achievement;
 import com.gage.elections.model.candidate.AchievementType;
+import com.gage.elections.util.SearchUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +21,7 @@ public class ContributionScoreCalculator {
         double totalManagement = calculateManagementScore(achievements);
         double totalHumanCapital = calculateHumanCapitalScore(achievements);
 
-        return round(Math.min(totalManagement + totalHumanCapital, 100.0));
+        return SearchUtils.round2Decimals(totalManagement + totalHumanCapital);
     }
 
     double calculateManagementScore(List<Achievement> achievements) {
@@ -44,7 +45,7 @@ public class ContributionScoreCalculator {
                     }
                 }
 
-                case LAW_PROPOSED -> positivePoints += 1.0; // Puntos por iniciativa legislativa
+                case LAW_PROPOSED -> positivePoints += props.getLawProposedPoints();
 
                 case PROMISE_BROKEN, FISCAL_DEBT_INCREASE -> {
                     double penaltyBase = props.getPenalties().getOrDefault(a.getType().name(), 15.0);
@@ -76,9 +77,6 @@ public class ContributionScoreCalculator {
         double expPoints = Math.min(yearsOfExp, props.getMaxYearsExperience());
         double academicBonus = props.getAcademicBonus(topAcademicLevel);
 
-        // Max 25 por "Kilometraje" + Max 25 por "Grado Académico" = 50
         return Math.min(expPoints + academicBonus, 50.0);
     }
-
-    double round(double value) { return Math.round(value * 100.0) / 100.0; }
 }

@@ -61,4 +61,8 @@ public class SearchUtils {
         return Arrays.stream(tokens).anyMatch(normalizedField::contains);
     }
 
+    public static double round2Decimals(double value) {
+        return Math.round(value * 100.0) / 100.0;
+    }
+
 }

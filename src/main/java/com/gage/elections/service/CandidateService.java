@@ -16,14 +16,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CandidateService {
 
     final CandidateRepository candidateRepository;
@@ -33,6 +34,7 @@ public class CandidateService {
     final MatchMapper matchMapper;
     final CandidateMapper candidateMapper;
 
+    @Transactional
     public void createCandidate(CandidateCreateRequest request) {
         Candidate candidate = candidateMapper.toCandidate(request);
 
@@ -44,6 +46,7 @@ public class CandidateService {
         candidateRepository.save(candidate);
     }
 
+    @Transactional
     public void createCandidates(List<CandidateCreateRequest> requests) {
         List<Candidate> candidates = requests.stream()
                 .map(candidateMapper::toCandidate)
@@ -52,25 +55,21 @@ public class CandidateService {
         candidateRepository.saveAll(candidates);
     }
 
+    @Transactional
     public Candidate updateCandidateAll(String code, CandidateCreateRequest request) {
-        // 1. Buscamos el original (el que tiene el ID de Mongo y los scores actuales)
+
         Candidate existing = getCandidateByCode(code);
-
-        // 2. IMPORTANTE: En lugar de toCandidate, usamos patchToCandidate
-        // Esto copia los datos del request SOBRE el objeto existente
         candidateMapper.putToCandidate(request, existing);
-
-        // 3. Ahora 'existing' tiene los datos nuevos pero conserva su ID y consistencia
         calculateScore(existing);
-
-        // 4. Guardamos el objeto original actualizado
         return candidateRepository.save(existing);
     }
 
+    @Transactional
     public Candidate updateCandidate(String code, CandidateUpdateRequest request) {
         return updateCandidateWithoutScore(code, candidate -> candidateMapper.patchToCandidate(request, candidate));
     }
 
+    @Transactional
     public Candidate updateHistory(String code, List<LegalHistoryEntry> history) {
         return updateCandidateWithScore(code, c -> {
             c.setHistory(history);
@@ -78,6 +77,7 @@ public class CandidateService {
         });
     }
 
+    @Transactional
     public Candidate updateProposals(String code, GovernmentPlan request) {
         return updateCandidateWithScore(code, c -> {
             GovernmentPlan plan = c.getGovernmentPlan();
@@ -141,7 +141,9 @@ public class CandidateService {
 
     public List<MatchResponse> searchCandidatesAtlas(String rawQuery) {
         String query = sanitizeAndValidate(rawQuery);
-        if (query == null) return Collections.emptyList();
+        if (query == null) {
+            throw new IllegalArgumentException("Query inválida: " + rawQuery);
+        }
 
         return candidateSearchRepository.searchByAtlas(query)
                 .stream()

@@ -4,13 +4,20 @@ server:
 spring:
   application:
     name: election-api
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
 
   data:
     mongodb:
-      uri: mongodb://localhost:27017/electiondb
+      uri: ${MONGO_URI_LOCAL:mongodb://localhost:27017/electiondb}
+jne:
+  api:
+    auth-token: ${JNE_AUTH_TOKEN:1454eebb-4b05-4400-93ac-25f0d0690d4b}
+    user-id: ${JNE_USER_ID:1381}
 
 logging:
   level:
+    root: INFO
+    com.gage.election: DEBUG
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG
-    org.mongodb.driver: INFO
 

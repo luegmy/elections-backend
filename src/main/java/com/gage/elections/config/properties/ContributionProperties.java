@@ -13,6 +13,7 @@ public class ContributionProperties {
     double maxSubScore;
     int maxItemsAllowed;
     int maxYearsExperience;
+    double lawProposedPoints;
 
     BonusStructure bonuses;
     Map<String, Double> penalties;

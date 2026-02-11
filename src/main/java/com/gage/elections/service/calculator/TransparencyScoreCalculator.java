@@ -25,7 +25,7 @@ public class TransparencyScoreCalculator {
 
             // Usamos un valor de castigo por defecto (ej. -30.0) si tiene más de 3 inconsistencias
             double inconsistencyImpact = props.getInconsistencyBonuses()
-                    .getOrDefault(inconsistency, -30.0);
+                    .getOrDefault(inconsistency, props.getInconsistencyDefaultPenalty());
 
             score += inconsistencyImpact;
         }

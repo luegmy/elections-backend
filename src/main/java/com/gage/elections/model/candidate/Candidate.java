@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +21,7 @@ public class Candidate {
     public static final String SEQUENCE_NAME = "candidate_sequence";
 
     @Id
+    @Field("strDocumentoIdentidad")
     String code;
     String name;
     String position;
@@ -39,6 +41,9 @@ public class Candidate {
 
     LocalDateTime lastAuditDate;
     String dataSourceVersion;
+
+    @Indexed
+    String jneExpediente;
 
     public void updateScoring(CompositeScore scores, int rankingLevel) {
         this.scores = scores;

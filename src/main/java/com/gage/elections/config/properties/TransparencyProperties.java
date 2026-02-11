@@ -16,4 +16,5 @@ public class TransparencyProperties {
     double economicInfoItem;
     double attendanceWeight;
     double defaultAttendancePoint;
+    double inconsistencyDefaultPenalty;
 }
