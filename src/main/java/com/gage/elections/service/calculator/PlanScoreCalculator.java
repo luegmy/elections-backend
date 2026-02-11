@@ -2,6 +2,7 @@ package com.gage.elections.service.calculator;
 
 import com.gage.elections.config.properties.PlanProperties;
 import com.gage.elections.model.candidate.Proposal;
+import com.gage.elections.util.SearchUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -46,7 +47,7 @@ public class PlanScoreCalculator {
                     proposalScore *= 0.70; // Penalización por "promesa al aire" (30%)
                 }
             } else if ("Muy Alto".equalsIgnoreCase(p.getCostEstimate())) {
-                proposalScore *= props.getCostEstimate();
+                proposalScore *= props.getCostEstimateHigh();
             }
 
             areaScores.merge(area, proposalScore, Double::sum);
@@ -62,7 +63,7 @@ public class PlanScoreCalculator {
         }
 
         double finalScore = (totalPlanPoints / mandatoryAreas.size()) * 100.0;
-        return round(finalScore);
+        return SearchUtils.round2Decimals(finalScore);
     }
 
     double calculateTechnicalFeasibility(Proposal p) {
@@ -78,8 +79,9 @@ public class PlanScoreCalculator {
 
         // 5. EL BONO ESTADISTA (Detección de Metas y Leyes)
         // Si menciona derogación de leyes pro-crimen o metas como "100% NDC"
-        if (TECHNICAL_PATTERN.matcher(detail.toLowerCase()).matches()) {
-            baseFeasibility *= 1.15; // Bono del 15% por ser auditable y específico
+        String lowerDetail = detail.toLowerCase();
+        if (TECHNICAL_PATTERN.matcher(lowerDetail).find()) { // .find() en vez de .matches()
+            baseFeasibility *= 1.15;
         }
 
         if (p.isRequiresConstitutionalReform()) {
@@ -91,9 +93,5 @@ public class PlanScoreCalculator {
         }
 
         return Math.min(baseFeasibility, 1.0); // No puede superar el 100%
-    }
-
-    double round(double value) {
-        return Math.round(value * 100.0) / 100.0;
     }
 }

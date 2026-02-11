@@ -2,6 +2,7 @@ package com.gage.elections.service.calculator;
 
 import com.gage.elections.config.properties.ScoringWeightsProperties;
 import com.gage.elections.model.candidate.*;
+import com.gage.elections.util.SearchUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,10 @@ public class ScoringEngine {
     public void recalculateFinalScore(Candidate candidate) {
 
         CompositeScore s = candidate.getScores();
-        if (s == null) return;
+        if (s == null) {
+            s = new CompositeScore();
+            candidate.setScores(s);
+        }
 
         double p1Judicial = s.getJudicialScore();
         double p2Transparency = s.getTransparencyScore();
@@ -66,7 +70,7 @@ public class ScoringEngine {
             finalScore -= 10.0;
         }
 
-        s.setFinalScore(Math.max(0.0, round2(finalScore)));
+        s.setFinalScore(Math.max(0.0, SearchUtils.round2Decimals(finalScore)));
     }
 
     public int determineRankingLevel(double finalScore) {
@@ -94,9 +98,5 @@ public class ScoringEngine {
 
     public double getContributionCalculator(List<Achievement> achievements) {
         return contributionCalculator.calculate(achievements);
-    }
-
-    double round2(double value) {
-        return Math.round(value * 100.0) / 100.0;
     }
 }

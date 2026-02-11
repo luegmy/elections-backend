@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "electoral.scoring.plan")
 public class PlanProperties {
 
-    double costEstimate;
+    double costEstimateHigh;
     double requiresConstitutionalReform;
     double violatesInternationalTreaties;
 }

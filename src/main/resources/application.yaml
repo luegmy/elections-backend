@@ -3,7 +3,6 @@ spring:
     name: election-api
   main:
     lazy-initialization: true
-
   data:
     mongodb:
       uri: ${MONGO_URI}
@@ -15,10 +14,12 @@ electoral:
     transparency: 0.20
     trust: 0.10
     contribution: 0.10
+
   scoring:
     judicial:
       base-score: 100.0
       penalties:
+
         # =========================================================
         # CATEGORÍA: PENAL
         # =========================================================
@@ -28,30 +29,34 @@ electoral:
             GRAVE: 50.0
             MODERADO: 30.0
             LEVE: 10.0
+
         - category: PENAL
           status: SENTENCIA_PRIMERA_INSTANCIA
           severity:
             GRAVE: 35.0
             MODERADO: 21.0
             LEVE: 7.0
+
         - category: PENAL
           status: PROCESO_JUDICIAL_ABIERTO
           severity:
-            GRAVE: 20.0
             MODERADO: 12.0
             LEVE: 4.0
+
         - category: PENAL
           status: INVESTIGACION_PRELIMINAR
           severity:
-            GRAVE: 10.0
-            MODERADO: 6.0
             LEVE: 2.0
-        - status: SENTENCIA_ABSOLUTORIA
-          category: PENAL
+
+        - category: PENAL
+          status: SENTENCIA_ABSOLUTORIA
           severity:
-            LEVE: 0
-            MODERADO: 0
-            GRAVE: 0
+            LEVE: 0.0
+
+        - category: PENAL
+          status: PRESCRITO
+          severity:
+            LEVE: 0.0
 
         # =========================================================
         # CATEGORÍA: FAMILIA
@@ -62,23 +67,23 @@ electoral:
             GRAVE: 40.0
             MODERADO: 30.0
             LEVE: 15.0
+
         - category: FAMILIA
           status: SENTENCIA_PRIMERA_INSTANCIA
           severity:
             GRAVE: 30.0
             MODERADO: 20.0
             LEVE: 10.0
+
         - category: FAMILIA
           status: PROCESO_JUDICIAL_ABIERTO
           severity:
-            GRAVE: 20.0
             MODERADO: 10.0
             LEVE: 5.0
+
         - category: FAMILIA
           status: INVESTIGACION_PRELIMINAR
           severity:
-            GRAVE: 10.0
-            MODERADO: 5.0
             LEVE: 3.0
 
         # =========================================================
@@ -90,23 +95,23 @@ electoral:
             GRAVE: 40.0
             MODERADO: 30.0
             LEVE: 15.0
+
         - category: TRIBUTARY
           status: SENTENCIA_PRIMERA_INSTANCIA
           severity:
             GRAVE: 25.0
             MODERADO: 18.0
             LEVE: 9.0
+
         - category: TRIBUTARY
           status: PROCESO_JUDICIAL_ABIERTO
           severity:
-            GRAVE: 20.0
             MODERADO: 12.0
             LEVE: 7.0
+
         - category: TRIBUTARY
           status: INVESTIGACION_PRELIMINAR
           severity:
-            GRAVE: 8.0
-            MODERADO: 5.0
             LEVE: 2.0
 
         # =========================================================
@@ -118,23 +123,23 @@ electoral:
             GRAVE: 35.0
             MODERADO: 20.0
             LEVE: 10.0
+
         - category: ADMINISTRATIVE
           status: SENTENCIA_PRIMERA_INSTANCIA
           severity:
             GRAVE: 20.0
             MODERADO: 15.0
             LEVE: 7.0
+
         - category: ADMINISTRATIVE
           status: PROCESO_JUDICIAL_ABIERTO
           severity:
-            GRAVE: 12.0
             MODERADO: 8.0
             LEVE: 4.0
+
         - category: ADMINISTRATIVE
           status: INVESTIGACION_PRELIMINAR
           severity:
-            GRAVE: 6.0
-            MODERADO: 4.0
             LEVE: 2.0
 
         # =========================================================
@@ -146,23 +151,23 @@ electoral:
             GRAVE: 30.0
             MODERADO: 20.0
             LEVE: 10.0
+
         - category: LABORAL
           status: SENTENCIA_PRIMERA_INSTANCIA
           severity:
             GRAVE: 20.0
             MODERADO: 14.0
             LEVE: 7.0
+
         - category: LABORAL
           status: PROCESO_JUDICIAL_ABIERTO
           severity:
-            GRAVE: 10.0
             MODERADO: 7.0
             LEVE: 5.0
+
         - category: LABORAL
           status: INVESTIGACION_PRELIMINAR
           severity:
-            GRAVE: 5.0
-            MODERADO: 3.0
             LEVE: 1.0
 
         # =========================================================
@@ -174,29 +179,32 @@ electoral:
             GRAVE: 20.0
             MODERADO: 15.0
             LEVE: 10.0
+
         - category: CIVIL
           status: SENTENCIA_PRIMERA_INSTANCIA
           severity:
             GRAVE: 14.0
             MODERADO: 10.0
             LEVE: 7.0
+
         - category: CIVIL
           status: PROCESO_JUDICIAL_ABIERTO
           severity:
-            GRAVE: 8.0
             MODERADO: 5.0
             LEVE: 2.0
+
         - category: CIVIL
           status: INVESTIGACION_PRELIMINAR
           severity:
-            GRAVE: 4.0
-            MODERADO: 2.0
             LEVE: 1.0
+
+      repeat-weights: [1.0, 0.5, 0.25, 0.1, 0.1]
 
     contribution:
       max-sub-score: 50.0
       max-years-experience: 10
       max-items-allowed: 5.0
+      law-proposed-points: 1.0
       bonuses:
         academic:
           doctorate: 25.0
@@ -221,6 +229,7 @@ electoral:
       economic-info-item: 10.0
       attendance-weight: 0.3
       default-attendance-point: 5.0
+      inconsistency-default-penalty: -30.0
 
     trust:
       initial-score: 100.0
@@ -240,6 +249,16 @@ electoral:
       costEstimateHigh: 0.75
       requiresConstitutionalReform: 0.85
       violatesInternationalTreaties: 0.1
+    rules:
+      level1-threshold: 85.0
+      level2-threshold: 65.0
+      level3-threshold: 40.0
+      judicial-critical-threshold: 40.0
+      judicial-critical-multiplier: 0.5
+      plan-low-threshold: 40.0
+      plan-low-penalty: 10.0
+
+    
 
 logging:
   level:

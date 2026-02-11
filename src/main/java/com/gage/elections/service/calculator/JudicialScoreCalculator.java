@@ -22,8 +22,11 @@ public class JudicialScoreCalculator {
 
         // 1. Agrupamos hitos por expediente para no castigar doble por el mismo caso
         Map<String, List<LegalHistoryEntry>> grouped = history.stream()
-                .filter(h -> h.getExpedientNumber() != null)
-                .collect(Collectors.groupingBy(LegalHistoryEntry::getExpedientNumber));
+                .collect(Collectors.groupingBy(
+                        h -> h.getExpedientNumber() != null
+                                ? h.getExpedientNumber()
+                                : "UNKNOWN_" + h.hashCode() // Agrupar por hash único
+                ));
 
         double totalPenalty = 0;
         // Definimos los pesos de tu escala: 100% (20), 50% (10), 25% (5), 10% (2)...
